@@ -249,6 +249,11 @@
       <div class="cat-name">Tizedes­törtek osztása</div>
       <div class="cat-hs">Rekord: <span id="hs-toszt">—</span></div>
     </button>
+    <button class="cat-btn" data-cat="toszt10">
+      <div class="cat-icon">÷10/100/1000</div>
+      <div class="cat-name">Osztás 10/100/1000-rel</div>
+      <div class="cat-hs">Rekord: <span id="hs-toszt10">—</span></div>
+    </button>
   </div>
 </div>
 
@@ -390,6 +395,19 @@ const CATS = {
         const aRaw = aTenths / 10;
         const aStr = Number.isInteger(aRaw) ? aRaw.toFixed(1) : fmtResult(aRaw);
         const ansStr = fmtResult(c / 10);
+        return { display:`${aStr} ÷ ${b} =`, answer:ansStr, key:`${aStr}d${b}` };
+      });
+    }
+  },
+  toszt10: {
+    name:'Osztás 10, 100, 1000-rel', color:'#ff6b9d', hsKey:'hs_toszt10', hasDot:true, maxUniq:600,
+    generate(u) {
+      return tryGen(u, 600, () => {
+        const b = [10,100,1000][rand(0,2)];
+        const aInt = rand(0, 1000000); // 0..1000.000
+        const aRaw = aInt / 1000;
+        const aStr = fmtResult(aRaw);
+        const ansStr = fmtResult(aRaw / b);
         return { display:`${aStr} ÷ ${b} =`, answer:ansStr, key:`${aStr}d${b}` };
       });
     }
