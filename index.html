@@ -283,6 +283,11 @@
           <div class="cat-name">Osztás 10/100/1000-rel</div>
           <div class="cat-hs">Rekord: <span id="hs-toszt10">—</span></div>
         </button>
+        <button class="cat-btn" data-cat="tort">
+          <div class="cat-icon">½</div>
+          <div class="cat-name">Törtek → tizedestört</div>
+          <div class="cat-hs">Rekord: <span id="hs-tort">—</span></div>
+        </button>
       </div>
     </div>
   </div>
@@ -444,8 +449,45 @@ const CATS = {
         const ansStr = fmtResult(aRaw / b);
         return { display:`${aStr} ÷ ${b} =`, answer:ansStr, key:`${aStr}d${b}` };
       });
-    }
-  }
+    }  },
+  tort: {
+    name:'Törtek → tizedestört', color:'#ffd166', hsKey:'hs_tort', hasDot:true, maxUniq:500,
+    generate(u) {
+      return tryGen(u, 500, () => {
+        let numerator, denominator, value;
+
+        while (true) {
+          const n = rand(1, 499); // 0.01..4.99
+          value = n / 100;
+
+          numerator = n;
+          denominator = 100;
+
+          const gcd = (a, b) => b ? gcd(b, a % b) : a;
+          const g = gcd(numerator, denominator);
+
+          numerator /= g;
+          denominator /= g;
+
+          if (
+            numerator <= 99 &&
+            denominator <= 99 &&
+            value > 0 &&
+            value < 5 &&
+            value % 1 !== 0 &&
+            value >= 0.05
+          ) {
+            break;
+          }
+        }
+
+        return {
+          display: `${numerator} ÷ ${denominator} =`,
+          answer: fmtResult(value),
+          key: `${numerator}/${denominator}`
+        };
+      });
+    }  }
 };
 
 // ── STORAGE ────────────────────────────────────────────────────
