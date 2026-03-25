@@ -69,7 +69,19 @@
     .logo-sub { font-size: 13px; color: var(--text-dim); margin-top: 3px; letter-spacing: 1px; text-transform: uppercase; }
 
     .categories { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; flex: 1; align-content: center; }
+    .category-group { margin-bottom: 30px;}
 
+    .category-group h2 {
+      margin-bottom: 10px;
+      font-size: 1.4rem;
+      color: #333;
+    }
+
+    .category-group .cat-btn {
+      display: block;
+      width: 100%;
+      margin-bottom: 10px;
+    }
     .cat-btn {
       --c: var(--c1);
       background: var(--surface);
@@ -229,31 +241,38 @@
     <div class="logo-sub">Válassz kategóriát!</div>
   </div>
   <div class="categories">
-    <button class="cat-btn" data-cat="szorzas">
-      <div class="cat-icon">×</div>
-      <div class="cat-name">Szorzótábla</div>
-      <div class="cat-hs">Rekord: <span id="hs-szorzas">—</span></div>
-    </button>
-    <button class="cat-btn" data-cat="osztas">
-      <div class="cat-icon">÷</div>
-      <div class="cat-name">Osztás</div>
-      <div class="cat-hs">Rekord: <span id="hs-osztas">—</span></div>
-    </button>
-    <button class="cat-btn" data-cat="tszorz">
-      <div class="cat-icon">.×10</div>
-      <div class="cat-name">Szorzás 10, 100, 1000-rel</div>
-      <div class="cat-hs">Rekord: <span id="hs-tszorz">—</span></div>
-    </button>
-    <button class="cat-btn" data-cat="toszt">
-      <div class="cat-icon">.÷</div>
-      <div class="cat-name">Tizedes­törtek osztása</div>
-      <div class="cat-hs">Rekord: <span id="hs-toszt">—</span></div>
-    </button>
-    <button class="cat-btn" data-cat="toszt10">
-      <div class="cat-icon">.÷10</div>
-      <div class="cat-name">Osztás 10/100/1000-rel</div>
-      <div class="cat-hs">Rekord: <span id="hs-toszt10">—</span></div>
-    </button>
+    <div class="category-group">
+      <h2>Alapműveletek</h2>
+      <button class="cat-btn" data-cat="szorzas">
+        <div class="cat-icon">×</div>
+        <div class="cat-name">Szorzótábla</div>
+        <div class="cat-hs">Rekord: <span id="hs-szorzas">—</span></div>
+      </button>
+      <button class="cat-btn" data-cat="osztas">
+        <div class="cat-icon">÷</div>
+        <div class="cat-name">Osztás</div>
+        <div class="cat-hs">Rekord: <span id="hs-osztas">—</span></div>
+      </button>
+    </div>
+
+    <div class="category-group">
+      <h2>Tizedestörtek</h2>
+      <button class="cat-btn" data-cat="tszorz">
+        <div class="cat-icon">.×10</div>
+        <div class="cat-name">Szorzás 10, 100, 1000-rel</div>
+        <div class="cat-hs">Rekord: <span id="hs-tszorz">—</span></div>
+      </button>
+      <button class="cat-btn" data-cat="toszt">
+        <div class="cat-icon">.÷</div>
+        <div class="cat-name">Tizedes­törtek osztása</div>
+        <div class="cat-hs">Rekord: <span id="hs-toszt">—</span></div>
+      </button>
+      <button class="cat-btn" data-cat="toszt10">
+        <div class="cat-icon">.÷10</div>
+        <div class="cat-name">Osztás 10/100/1000-rel</div>
+        <div class="cat-hs">Rekord: <span id="hs-toszt10">—</span></div>
+      </button>
+    </div>
   </div>
 </div>
 
