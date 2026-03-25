@@ -289,18 +289,24 @@ function endGame(){
 }
 
 // ── EVENTS ──────────────────────────────────────────
-document.querySelectorAll('.cat-btn').forEach(btn=>{
-  btn.onclick=()=>startGame(btn.dataset.cat);
+document.addEventListener('DOMContentLoaded', () => {
+
+  document.querySelectorAll('.cat-btn').forEach(btn=>{
+    btn.onclick = () => startGame(btn.dataset.cat);
+  });
+
+  document.querySelectorAll('.kb-btn').forEach(btn=>{
+    btn.onclick = () => handleKey(btn.textContent==='⌫' ? 'DEL' : btn.textContent);
+  });
+
+  const retryBtn = document.getElementById('btn-retry');
+  if (retryBtn) retryBtn.onclick = () => startGame(S.cat);
+
+  const homeBtn = document.getElementById('btn-home');
+  if (homeBtn) homeBtn.onclick = () => showScreen('home');
+
+  showScreen('home');
 });
-
-document.querySelectorAll('.kb-btn').forEach(btn=>{
-  btn.onclick=()=>handleKey(btn.textContent==='⌫'?'DEL':btn.textContent);
-});
-
-document.getElementById('btn-retry').onclick=()=>startGame(S.cat);
-document.getElementById('btn-home').onclick=()=>showScreen('home');
-
-showScreen('home');
 
 </script>
 </body>
