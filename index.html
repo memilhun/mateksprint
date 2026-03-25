@@ -6,7 +6,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="MatekSprint">
-  <meta name="theme-color" content="#1a1a2e">
+  <meta name="theme-color" content="#0f0f1a">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
   <title>MatekSprint</title>
@@ -14,511 +14,213 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Nunito:wght@500;700;800;900&display=swap" rel="stylesheet">
 
   <style>
-    /* ── RESET & BASE ──────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:         #0f0f1a;
-      --surface:    #1a1a2e;
-      --surface2:   #252540;
-      --text:       #f0f0ff;
-      --text-dim:   #8888aa;
-      --c1:         #4cc9f0;   /* szorzás  – cyan   */
-      --c2:         #ff9e00;   /* osztás   – amber  */
-      --c3:         #06d6a0;   /* tized×   – mint   */
-      --c4:         #ff6b9d;   /* tized÷   – pink   */
-      --danger:     #ff4d6d;
-      --font-ui:    'Nunito', sans-serif;
-      --font-num:   'Space Mono', monospace;
-      --safe-top:   env(safe-area-inset-top, 0px);
-      --safe-bot:   env(safe-area-inset-bottom, 0px);
+      --bg:       #0f0f1a;
+      --surface:  #1a1a2e;
+      --surface2: #252540;
+      --text:     #f0f0ff;
+      --text-dim: #8888aa;
+      --c1: #4cc9f0;
+      --c2: #ff9e00;
+      --c3: #06d6a0;
+      --c4: #ff6b9d;
+      --danger: #ff4d6d;
+      --ok:     #06d6a0;
+      --font-ui:  'Nunito', sans-serif;
+      --font-num: 'Space Mono', monospace;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bot: env(safe-area-inset-bottom, 0px);
+      --accent: #4cc9f0;
     }
 
     html, body {
-      height: 100%;
-      width: 100%;
+      height: 100%; width: 100%;
       overflow: hidden;
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
-    }
-
-    body {
       font-family: var(--font-ui);
       background: var(--bg);
       color: var(--text);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
     }
 
-    /* ── SCREENS ───────────────────────────────────────────── */
     .screen {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center;
       padding-top: calc(var(--safe-top) + 12px);
       padding-bottom: calc(var(--safe-bot) + 12px);
-      padding-left: 16px;
-      padding-right: 16px;
+      padding-left: 16px; padding-right: 16px;
       transition: opacity .18s ease, transform .18s ease;
       overflow: hidden;
     }
-
     .screen.hidden { opacity: 0; pointer-events: none; transform: scale(.96); }
 
-    /* ══════════════════════════════════════════════════════════
-       HOME SCREEN
-    ══════════════════════════════════════════════════════════ */
-    #home {
-      justify-content: flex-start;
-      gap: 0;
-    }
+    /* ══ HOME ═══════════════════════════════════════════════ */
+    #home { justify-content: flex-start; }
 
-    .home-header {
-      width: 100%;
-      text-align: center;
-      padding: 18px 0 22px;
-    }
-
+    .home-header { width: 100%; text-align: center; padding: 18px 0 22px; }
     .logo {
       font-family: var(--font-num);
-      font-size: clamp(28px, 8vw, 38px);
-      font-weight: 700;
-      letter-spacing: -1px;
+      font-size: clamp(28px, 8vw, 38px); font-weight: 700; letter-spacing: -1px;
       background: linear-gradient(135deg, #4cc9f0, #ff6b9d);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
     }
+    .logo-sub { font-size: 13px; color: var(--text-dim); margin-top: 3px; letter-spacing: 1px; text-transform: uppercase; }
 
-    .logo-sub {
-      font-size: 13px;
-      color: var(--text-dim);
-      margin-top: 3px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-    }
-
-    .categories {
-      width: 100%;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      flex: 1;
-      align-content: center;
-    }
+    .categories { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; flex: 1; align-content: center; }
 
     .cat-btn {
       --c: var(--c1);
       background: var(--surface);
       border: 2px solid color-mix(in srgb, var(--c) 40%, transparent);
-      border-radius: 20px;
-      padding: 18px 14px 16px;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      transition: transform .12s, border-color .12s, box-shadow .12s;
-      -webkit-user-select: none;
-      user-select: none;
-      position: relative;
-      overflow: hidden;
+      border-radius: 20px; padding: 18px 14px 16px; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      transition: transform .12s; -webkit-user-select: none; user-select: none;
+      position: relative; overflow: hidden;
     }
-
     .cat-btn::before {
-      content: '';
-      position: absolute;
-      inset: 0;
+      content: ''; position: absolute; inset: 0;
       background: radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--c) 18%, transparent), transparent 70%);
     }
-
     .cat-btn:active { transform: scale(.95); }
-
-    .cat-icon {
-      font-family: var(--font-num);
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--c);
-      line-height: 1;
-    }
-
-    .cat-name {
-      font-size: 12px;
-      font-weight: 800;
-      text-align: center;
-      color: var(--text);
-      line-height: 1.3;
-    }
-
-    .cat-hs {
-      font-family: var(--font-num);
-      font-size: 11px;
-      color: var(--text-dim);
-      margin-top: 2px;
-    }
-
-    .cat-hs span {
-      color: var(--c);
-      font-weight: 700;
-    }
-
     .cat-btn[data-cat="szorzas"] { --c: var(--c1); }
     .cat-btn[data-cat="osztas"]  { --c: var(--c2); }
     .cat-btn[data-cat="tszorz"]  { --c: var(--c3); }
     .cat-btn[data-cat="toszt"]   { --c: var(--c4); }
 
-    /* ══════════════════════════════════════════════════════════
-       GAME SCREEN
-    ══════════════════════════════════════════════════════════ */
-    #game {
-      justify-content: space-between;
-      gap: 8px;
-    }
+    .cat-icon { font-family: var(--font-num); font-size: 28px; font-weight: 700; color: var(--c); line-height: 1; }
+    .cat-name { font-size: 11px; font-weight: 800; text-align: center; color: var(--text); line-height: 1.3; }
+    .cat-hs   { font-family: var(--font-num); font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+    .cat-hs span { color: var(--c); font-weight: 700; }
 
-    .game-topbar {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 6px 4px;
-    }
+    /* ══ GAME ════════════════════════════════════════════════ */
+    #game { justify-content: space-between; gap: 8px; }
 
-    .score-display {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-    }
-
-    .score-label {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--text-dim);
-    }
-
-    .score-num {
-      font-family: var(--font-num);
-      font-size: 36px;
-      font-weight: 700;
-      color: var(--text);
-      line-height: 1;
-      transition: transform .1s;
-    }
-
-    .score-num.bump {
-      transform: scale(1.25);
-    }
-
-    .timer-wrap {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-    }
-
-    .timer-label {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--text-dim);
-    }
-
-    .timer-num {
-      font-family: var(--font-num);
-      font-size: 44px;
-      font-weight: 700;
-      color: var(--text);
-      line-height: 1;
-      transition: color .3s;
-    }
-
+    .game-topbar { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 6px 4px; }
+    .score-display { display: flex; flex-direction: column; align-items: flex-start; }
+    .score-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); }
+    .score-num   { font-family: var(--font-num); font-size: 36px; font-weight: 700; color: var(--text); line-height: 1; transition: transform .1s; }
+    .score-num.bump { transform: scale(1.25); }
+    .timer-wrap  { display: flex; flex-direction: column; align-items: flex-end; }
+    .timer-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); }
+    .timer-num   { font-family: var(--font-num); font-size: 44px; font-weight: 700; color: var(--text); line-height: 1; transition: color .3s; }
     .timer-num.danger { color: var(--danger); }
 
-    /* progress bar */
-    .progress-bar {
-      width: 100%;
-      height: 4px;
-      background: var(--surface2);
-      border-radius: 2px;
-      overflow: hidden;
-    }
+    .progress-bar  { width: 100%; height: 4px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
+    .progress-fill { height: 100%; width: 100%; background: var(--accent); border-radius: 2px; transition: width 1s linear, background-color .3s; }
 
-    .progress-fill {
-      height: 100%;
-      width: 100%;
-      background: var(--accent);
-      border-radius: 2px;
-      transform-origin: left;
-      transition: width 1s linear, background-color .3s;
-    }
-
-    /* task area */
-    .task-area {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      width: 100%;
-    }
-
-    .cat-badge {
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      color: var(--accent);
-      opacity: .7;
-    }
-
-    .task-eq {
-      font-family: var(--font-num);
-      font-size: clamp(32px, 10vw, 48px);
-      font-weight: 700;
-      color: var(--text);
-      text-align: center;
-      line-height: 1.1;
-    }
+    .task-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; width: 100%; }
+    .cat-badge { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--accent); opacity: .7; }
+    .task-eq   { font-family: var(--font-num); font-size: clamp(30px, 9vw, 46px); font-weight: 700; color: var(--text); text-align: center; line-height: 1.1; }
 
     .answer-box {
-      font-family: var(--font-num);
-      font-size: clamp(36px, 11vw, 52px);
-      font-weight: 700;
-      color: var(--accent);
-      min-width: 140px;
-      min-height: 64px;
-      text-align: center;
+      font-family: var(--font-num); font-size: clamp(34px, 10vw, 50px); font-weight: 700; color: var(--accent);
+      min-width: 140px; min-height: 64px; text-align: center;
       background: var(--surface);
-      border: 2.5px solid color-mix(in srgb, var(--accent) 50%, transparent);
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0 20px;
-      letter-spacing: 2px;
-      transition: border-color .15s;
+      border: 2.5px solid color-mix(in srgb, var(--accent) 35%, transparent);
+      border-radius: 16px; display: flex; align-items: center; justify-content: center;
+      padding: 0 20px; letter-spacing: 2px; transition: border-color .15s;
     }
-
-    .answer-box.has-input {
-      border-color: var(--accent);
-    }
+    .answer-box.has-input { border-color: var(--accent); }
 
     .cursor {
-      display: inline-block;
-      width: 3px;
-      height: 1em;
-      background: var(--accent);
-      margin-left: 3px;
-      animation: blink .8s step-end infinite;
-      border-radius: 2px;
+      display: inline-block; width: 3px; height: 1em;
+      background: var(--accent); margin-left: 3px;
+      animation: blink .8s step-end infinite; border-radius: 2px;
     }
-
     @keyframes blink { 50% { opacity: 0; } }
 
-    /* keyboard */
-    .keyboard {
-      width: 100%;
-      max-width: 340px;
-    }
-
-    .kb-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-    }
+    .keyboard { width: 100%; max-width: 340px; }
+    .kb-grid  { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 
     .kb-btn {
-      font-family: var(--font-num);
-      font-size: 22px;
-      font-weight: 700;
-      background: var(--surface);
-      border: 2px solid var(--surface2);
-      border-radius: 14px;
-      color: var(--text);
-      cursor: pointer;
-      aspect-ratio: 1.4;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      -webkit-user-select: none;
-      user-select: none;
-      transition: background .08s, transform .08s;
-      position: relative;
-      overflow: hidden;
+      font-family: var(--font-num); font-size: 22px; font-weight: 700;
+      background: var(--surface); border: 2px solid var(--surface2);
+      border-radius: 14px; color: var(--text); cursor: pointer;
+      aspect-ratio: 1.4; display: flex; align-items: center; justify-content: center;
+      -webkit-user-select: none; user-select: none; transition: background .08s, transform .08s;
     }
+    .kb-btn:active, .kb-btn.pressed { background: var(--surface2); transform: scale(.92); }
+    .kb-btn.kb-ok  { background: var(--accent); border-color: var(--accent); color: #fff; font-size: 18px; letter-spacing: 1px; }
+    .kb-btn.kb-ok:active, .kb-btn.kb-ok.pressed { background: color-mix(in srgb, var(--accent) 75%, #000); }
+    .kb-btn.kb-del { font-size: 20px; }
+    .kb-btn.kb-dot { font-size: 28px; font-weight: 900; }
 
-    .kb-btn:active, .kb-btn.pressed {
-      background: var(--surface2);
-      transform: scale(.92);
+    /* ══ RESULT ══════════════════════════════════════════════ */
+    #result { justify-content: flex-start; overflow-y: auto; -webkit-overflow-scrolling: touch; gap: 0; }
+
+    .result-top {
+      width: 100%; display: flex; flex-direction: column; align-items: center;
+      gap: 14px; padding-bottom: 20px; flex-shrink: 0;
     }
+    .result-badge { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); opacity: .8; padding-top: 8px; }
+    .result-score { text-align: center; }
+    .result-num   { font-family: var(--font-num); font-size: clamp(60px, 18vw, 90px); font-weight: 700; color: var(--accent); line-height: 1; }
+    .result-label { font-size: 16px; color: var(--text-dim); margin-top: 4px; }
+    .stars        { display: flex; gap: 8px; font-size: 28px; }
 
-    .kb-btn.kb-ok {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: #fff;
-      font-size: 18px;
-      letter-spacing: 1px;
-    }
+    .result-hs-wrap { background: var(--surface); border-radius: 16px; padding: 14px 32px; text-align: center; width: 100%; max-width: 280px; }
+    .result-hs-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-dim); }
+    .result-hs-val   { font-family: var(--font-num); font-size: 26px; font-weight: 700; color: var(--text); margin-top: 4px; }
+    .new-record      { font-size: 13px; font-weight: 800; color: #ffd60a; text-transform: uppercase; letter-spacing: 1px; animation: pulse 1s ease-in-out infinite; margin-top: 4px; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.45} }
 
-    .kb-btn.kb-ok:active, .kb-btn.kb-ok.pressed {
-      background: color-mix(in srgb, var(--accent) 75%, #000);
-    }
-
-    .kb-btn.kb-del {
-      font-size: 20px;
-    }
-
-    .kb-btn.kb-dot {
-      font-size: 28px;
-      font-weight: 900;
-    }
-
-    /* ══════════════════════════════════════════════════════════
-       RESULT SCREEN
-    ══════════════════════════════════════════════════════════ */
-    #result {
-      justify-content: center;
-      gap: 24px;
-    }
-
-    .result-badge {
-      font-size: 13px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      color: var(--accent);
-      opacity: .8;
-    }
-
-    .result-score {
-      text-align: center;
-    }
-
-    .result-num {
-      font-family: var(--font-num);
-      font-size: clamp(72px, 22vw, 100px);
-      font-weight: 700;
-      color: var(--accent);
-      line-height: 1;
-    }
-
-    .result-label {
-      font-size: 18px;
-      color: var(--text-dim);
-      margin-top: 8px;
-    }
-
-    .result-hs-wrap {
-      background: var(--surface);
-      border-radius: 16px;
-      padding: 16px 32px;
-      text-align: center;
-      width: 100%;
-      max-width: 280px;
-    }
-
-    .result-hs-label {
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      color: var(--text-dim);
-    }
-
-    .result-hs-val {
-      font-family: var(--font-num);
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--text);
-      margin-top: 4px;
-    }
-
-    .new-record {
-      font-size: 14px;
-      font-weight: 800;
-      color: #ffd60a;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      animation: pulse 1s ease-in-out infinite;
-    }
-
-    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.5; } }
-
-    .result-btns {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      width: 100%;
-      max-width: 280px;
-    }
-
+    .result-btns { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 280px; }
     .btn-primary {
-      font-family: var(--font-ui);
-      font-size: 18px;
-      font-weight: 800;
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 16px;
-      padding: 18px;
-      cursor: pointer;
-      -webkit-user-select: none;
-      user-select: none;
-      transition: transform .1s, opacity .1s;
+      font-family: var(--font-ui); font-size: 18px; font-weight: 800;
+      background: var(--accent); color: #fff; border: none; border-radius: 16px; padding: 16px;
+      cursor: pointer; -webkit-user-select: none; user-select: none; transition: transform .1s;
     }
-
     .btn-primary:active { transform: scale(.96); }
-
     .btn-secondary {
-      font-family: var(--font-ui);
-      font-size: 16px;
-      font-weight: 700;
-      background: var(--surface);
-      color: var(--text-dim);
-      border: 2px solid var(--surface2);
-      border-radius: 16px;
-      padding: 16px;
-      cursor: pointer;
-      -webkit-user-select: none;
-      user-select: none;
-      transition: transform .1s;
+      font-family: var(--font-ui); font-size: 16px; font-weight: 700;
+      background: var(--surface); color: var(--text-dim);
+      border: 2px solid var(--surface2); border-radius: 16px; padding: 14px;
+      cursor: pointer; -webkit-user-select: none; user-select: none; transition: transform .1s;
     }
-
     .btn-secondary:active { transform: scale(.96); }
 
-    /* stars */
-    .stars {
-      display: flex;
-      gap: 8px;
-      font-size: 32px;
+    /* ── History ───────────────────────────────────────────── */
+    .history-wrap { width: 100%; flex-shrink: 0; padding-bottom: 24px; }
+    .history-title {
+      font-size: 12px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 1.5px; color: var(--text-dim); margin-bottom: 10px; padding-left: 4px;
+    }
+    .history-list { display: flex; flex-direction: column; gap: 7px; width: 100%; }
+
+    .history-item {
+      display: flex; align-items: center;
+      background: var(--surface); border-radius: 12px;
+      padding: 10px 12px; border-left: 4px solid transparent; gap: 8px;
+    }
+    .history-item.correct { border-left-color: var(--ok); }
+    .history-item.wrong   { border-left-color: var(--danger); }
+
+    .history-icon { font-size: 15px; flex-shrink: 0; width: 20px; text-align: center; }
+    .history-item.correct .history-icon { color: var(--ok); }
+    .history-item.wrong   .history-icon { color: var(--danger); }
+
+    .history-eq {
+      font-family: var(--font-num); font-size: 14px; color: var(--text); flex: 1; min-width: 0;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
 
-    /* ── STARFIELD BG ───────────────────────────────────────── */
-    .stars-bg {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: -1;
+    .history-user {
+      font-family: var(--font-num); font-size: 14px; font-weight: 700; flex-shrink: 0;
     }
+    .history-item.correct .history-user { color: var(--ok); }
+    .history-item.wrong   .history-user { color: var(--danger); }
 
-    .star {
-      position: absolute;
-      background: #fff;
-      border-radius: 50%;
-      opacity: .25;
-      animation: twinkle var(--d) ease-in-out infinite;
-    }
+    .history-arrow { font-size: 12px; color: var(--text-dim); flex-shrink: 0; }
+    .history-correct-ans { font-family: var(--font-num); font-size: 14px; font-weight: 700; color: var(--text); flex-shrink: 0; }
 
-    @keyframes twinkle { 0%,100%{opacity:.1} 50%{opacity:.4} }
+    /* starfield */
+    .stars-bg { position: fixed; inset: 0; pointer-events: none; z-index: -1; }
   </style>
 </head>
 <body>
-
-<!-- starfield -->
-<canvas class="stars-bg" id="stars"></canvas>
+<canvas class="stars-bg" id="stars-canvas"></canvas>
 
 <!-- ══ HOME ══════════════════════════════════════════════════ -->
 <div class="screen" id="home">
@@ -526,24 +228,23 @@
     <div class="logo">MatekSprint</div>
     <div class="logo-sub">Válassz kategóriát!</div>
   </div>
-
   <div class="categories">
-    <button class="cat-btn" data-cat="szorzas" id="btn-szorzas">
+    <button class="cat-btn" data-cat="szorzas">
       <div class="cat-icon">×</div>
-      <div class="cat-name">Szorzó­tábla</div>
+      <div class="cat-name">Szorzótábla</div>
       <div class="cat-hs">Rekord: <span id="hs-szorzas">—</span></div>
     </button>
-    <button class="cat-btn" data-cat="osztas" id="btn-osztas">
+    <button class="cat-btn" data-cat="osztas">
       <div class="cat-icon">÷</div>
       <div class="cat-name">Osztás</div>
       <div class="cat-hs">Rekord: <span id="hs-osztas">—</span></div>
     </button>
-    <button class="cat-btn" data-cat="tszorz" id="btn-tszorz">
+    <button class="cat-btn" data-cat="tszorz">
       <div class="cat-icon">·×</div>
-      <div class="cat-name">Tizedes­törtek szorzása</div>
+      <div class="cat-name">Szorzás 10, 100, 1000-rel</div>
       <div class="cat-hs">Rekord: <span id="hs-tszorz">—</span></div>
     </button>
-    <button class="cat-btn" data-cat="toszt" id="btn-toszt">
+    <button class="cat-btn" data-cat="toszt">
       <div class="cat-icon">·÷</div>
       <div class="cat-name">Tizedes­törtek osztása</div>
       <div class="cat-hs">Rekord: <span id="hs-toszt">—</span></div>
@@ -563,206 +264,160 @@
       <div class="timer-num" id="timer-num">60</div>
     </div>
   </div>
-
   <div class="progress-bar">
     <div class="progress-fill" id="progress-fill"></div>
   </div>
-
   <div class="task-area">
-    <div class="cat-badge" id="cat-badge">Szorzótábla</div>
-    <div class="task-eq" id="task-eq">7 × 8 =</div>
-    <div class="answer-box" id="answer-box"><span id="answer-text"></span><span class="cursor"></span></div>
-  </div>
-
-  <div class="keyboard">
-    <div class="kb-grid" id="kb-grid">
-      <button class="kb-btn" data-v="1">1</button>
-      <button class="kb-btn" data-v="2">2</button>
-      <button class="kb-btn" data-v="3">3</button>
-      <button class="kb-btn" data-v="4">4</button>
-      <button class="kb-btn" data-v="5">5</button>
-      <button class="kb-btn" data-v="6">6</button>
-      <button class="kb-btn" data-v="7">7</button>
-      <button class="kb-btn" data-v="8">8</button>
-      <button class="kb-btn" data-v="9">9</button>
-      <button class="kb-btn kb-del" data-v="DEL">⌫</button>
-      <button class="kb-btn" data-v="0">0</button>
-      <button class="kb-btn kb-ok" data-v="OK">OK</button>
+    <div class="cat-badge" id="cat-badge"></div>
+    <div class="task-eq"   id="task-eq"></div>
+    <div class="answer-box" id="answer-box">
+      <span id="answer-text"></span><span class="cursor"></span>
     </div>
+  </div>
+  <div class="keyboard">
+    <div class="kb-grid" id="kb-grid"></div>
   </div>
 </div>
 
-<!-- ══ RESULT ═════════════════════════════════════════════════ -->
+<!-- ══ RESULT ════════════════════════════════════════════════ -->
 <div class="screen hidden" id="result">
-  <div class="result-badge" id="result-cat-badge">Szorzótábla</div>
-
-  <div class="result-score">
-    <div class="result-num" id="result-num">0</div>
-    <div class="result-label" id="result-label">feladatot oldottál meg!</div>
+  <div class="result-top">
+    <div class="result-badge" id="result-cat-badge"></div>
+    <div class="result-score">
+      <div class="result-num" id="result-num">0</div>
+      <div class="result-label">feladatot oldottál meg!</div>
+    </div>
+    <div class="stars" id="result-stars"></div>
+    <div class="result-hs-wrap">
+      <div class="result-hs-label">Eddigi legjobb</div>
+      <div class="result-hs-val" id="result-hs-val">—</div>
+      <div class="new-record hidden" id="new-record">🏆 Új rekord!</div>
+    </div>
+    <div class="result-btns">
+      <button class="btn-primary"   id="btn-retry">Újra!</button>
+      <button class="btn-secondary" id="btn-home">Főmenü</button>
+    </div>
   </div>
 
-  <div class="stars" id="result-stars"></div>
-
-  <div class="result-hs-wrap">
-    <div class="result-hs-label">Eddigi legjobb</div>
-    <div class="result-hs-val" id="result-hs-val">—</div>
-    <div class="new-record hidden" id="new-record">🏆 Új rekord!</div>
-  </div>
-
-  <div class="result-btns">
-    <button class="btn-primary" id="btn-retry">Újra!</button>
-    <button class="btn-secondary" id="btn-home">Főmenü</button>
+  <div class="history-wrap">
+    <div class="history-title">Feladatok áttekintése</div>
+    <div class="history-list" id="history-list"></div>
   </div>
 </div>
 
 <script>
 // ── STARFIELD ──────────────────────────────────────────────────
-(function() {
-  const c = document.getElementById('stars');
+(function(){
+  const c = document.getElementById('stars-canvas');
   const ctx = c.getContext('2d');
-  c.width = window.innerWidth;
-  c.height = window.innerHeight;
+  c.width = window.innerWidth; c.height = window.innerHeight;
   for (let i = 0; i < 80; i++) {
-    const r = Math.random() * 1.5 + .5;
-    const x = Math.random() * c.width;
-    const y = Math.random() * c.height;
     ctx.beginPath();
-    ctx.arc(x, y, r, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(255,255,255,${Math.random() * .25 + .05})`;
+    ctx.arc(Math.random()*c.width, Math.random()*c.height, Math.random()*1.5+.5, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(255,255,255,${Math.random()*.25+.05})`;
     ctx.fill();
   }
 })();
 
-// ── CATEGORY CONFIG ────────────────────────────────────────────
+// ── HELPERS ────────────────────────────────────────────────────
+const rand = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
+
+function fmtResult(n) {
+  // Remove floating-point noise then strip trailing zeros
+  const s = parseFloat(n.toFixed(8)).toString();
+  return s;
+}
+
+function tryGen(used, maxUniq, fn) {
+  if (used.size >= maxUniq * 0.9) used.clear();
+  let t, tries = 0;
+  do { t = fn(); tries++; } while (used.has(t.key) && tries < 60);
+  used.add(t.key);
+  return t;
+}
+
+// ── CATEGORIES ────────────────────────────────────────────────
 const CATS = {
   szorzas: {
-    name: 'Szorzótábla',
-    color: '#4cc9f0',
-    hsKey: 'hs_szorzas',
-    hasDot: false,
-    maxTasks: 81,
-    generate(usedKeys) {
-      return tryGenerate(usedKeys, 81, () => {
-        const a = rand(1,9), b = rand(1,9);
-        return { display:`${a} × ${b} =`, answer: String(a*b), key:`${a}x${b}` };
+    name:'Szorzótábla', color:'#4cc9f0', hsKey:'hs_szorzas', hasDot:false, maxUniq:81,
+    generate(u) {
+      return tryGen(u, 81, () => {
+        const a=rand(1,9), b=rand(1,9);
+        return { display:`${a} × ${b} =`, answer:String(a*b), key:`${a}x${b}` };
       });
     }
   },
   osztas: {
-    name: 'Osztás',
-    color: '#ff9e00',
-    hsKey: 'hs_osztas',
-    hasDot: false,
-    maxTasks: 64,
-    generate(usedKeys) {
-      return tryGenerate(usedKeys, 64, () => {
-        const b = rand(2,9), c = rand(2,9), a = b*c;
-        return { display:`${a} ÷ ${b} =`, answer: String(c), key:`${a}d${b}` };
+    name:'Osztás', color:'#ff9e00', hsKey:'hs_osztas', hasDot:false, maxUniq:64,
+    generate(u) {
+      return tryGen(u, 64, () => {
+        const b=rand(2,9), c=rand(2,9);
+        return { display:`${b*c} ÷ ${b} =`, answer:String(c), key:`${b*c}d${b}` };
       });
     }
   },
   tszorz: {
-    name: 'Tizedes × egész',
-    color: '#06d6a0',
-    hsKey: 'hs_tszorz',
-    hasDot: true,
-    maxTasks: 500,
-    generate(usedKeys) {
-      return tryGenerate(usedKeys, 500, () => {
-        // A = aHundredths/100, aHundredths ∈ [5,200] → A ∈ [0.05, 2.00]
-        const aHundredths = rand(5, 200);
-        const b = rand(1, 10);
-        const resultHundredths = aHundredths * b;
-        const aStr = fmtNum(aHundredths / 100);
-        const ansStr = fmtNum(resultHundredths / 100);
-        return { display:`${aStr} × ${b} =`, answer: ansStr, key:`${aStr}x${b}` };
+    // Szorzás 10 / 100 / 1000-rel
+    // Szorzandó: 0 < A < 10, pontosan 2 vagy 3 tizedesjeggyel (utolsó nem nulla)
+    name:'Szorzás 10, 100, 1000-rel', color:'#06d6a0', hsKey:'hs_tszorz', hasDot:true, maxUniq:600,
+    generate(u) {
+      return tryGen(u, 600, () => {
+        const multipliers = [10, 100, 1000];
+        const b   = multipliers[rand(0,2)];
+        const dec = rand(2,3);               // 2 vagy 3 tizedesjegy
+        const scale = Math.pow(10, dec);
+        // aInt: 1..(10*scale-1), utolsó jegy nem nulla → valódi dec tizedesszám
+        let aInt;
+        do { aInt = rand(1, 10*scale - 1); } while (aInt % 10 === 0);
+
+        const aStr = (aInt / scale).toFixed(dec);   // pl. "3.450" → "3.45" (toFixed megadja dec jegyet)
+        // Valódi dec jegy: aInt % 10 !== 0 garantálja
+
+        // Egész aritmetika az eredményhez (nincs lebegőpontos hiba)
+        const resultInt = aInt * b;           // egész
+        const ansStr = fmtResult(resultInt / scale); // egyszerűsítés
+
+        return { display:`${aStr} × ${b} =`, answer:ansStr, key:`${aStr}x${b}` };
       });
     }
   },
   toszt: {
-    name: 'Tizedes ÷ egész',
-    color: '#ff6b9d',
-    hsKey: 'hs_toszt',
-    hasDot: true,
-    maxTasks: 500,
-    generate(usedKeys) {
-      return tryGenerate(usedKeys, 500, () => {
-        // result = c/10, A = c*b/10, guaranteed exact
-        const c = rand(1, 99), b = rand(1, 10);
-        const aTenths = c * b;            // A = aTenths/10
-        const aStr = fmtNum(aTenths / 10, 1);  // at least 1 decimal
-        const ansStr = fmtNum(c / 10, 1);
-        return { display:`${aStr} ÷ ${b} =`, answer: ansStr, key:`${aStr}d${b}` };
+    name:'Tizedes ÷ egész', color:'#ff6b9d', hsKey:'hs_toszt', hasDot:true, maxUniq:500,
+    generate(u) {
+      return tryGen(u, 500, () => {
+        const c=rand(1,99), b=rand(1,10);
+        const aTenths = c * b;
+        const aRaw = aTenths / 10;
+        const aStr = Number.isInteger(aRaw) ? aRaw.toFixed(1) : fmtResult(aRaw);
+        const ansStr = fmtResult(c / 10);
+        return { display:`${aStr} ÷ ${b} =`, answer:ansStr, key:`${aStr}d${b}` };
       });
     }
   }
 };
 
-// ── HELPERS ────────────────────────────────────────────────────
-function rand(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function fmtNum(n, minDec = 0) {
-  let s = n.toFixed(2);
-  // remove trailing zeros after decimal
-  s = s.replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '');
-  // ensure minimum decimals (for tizedes display)
-  if (minDec > 0 && !s.includes('.')) s += '.' + '0'.repeat(minDec);
-  return s;
-}
-
-function tryGenerate(usedKeys, maxUnique, genFn) {
-  // if we've used most unique tasks, reset
-  if (usedKeys.size >= maxUnique * 0.9) usedKeys.clear();
-  let task, tries = 0;
-  do {
-    task = genFn();
-    tries++;
-  } while (usedKeys.has(task.key) && tries < 50);
-  usedKeys.add(task.key);
-  return task;
-}
-
 // ── STORAGE ────────────────────────────────────────────────────
-function loadHS(key) {
-  try { return parseInt(localStorage.getItem(key)) || 0; }
-  catch { return 0; }
-}
-function saveHS(key, val) {
-  try { localStorage.setItem(key, String(val)); } catch {}
-}
+const loadHS = key => { try { return parseInt(localStorage.getItem(key))||0; } catch { return 0; }};
+const saveHS = (key,v) => { try { localStorage.setItem(key,String(v)); } catch {} };
 
 // ── STATE ──────────────────────────────────────────────────────
-let state = {
-  screen: 'home',
-  cat: null,
-  score: 0,
-  timeLeft: 60,
-  timer: null,
-  usedKeys: new Set(),
-  currentTask: null,
-  input: '',
-};
+let S = { cat:null, score:0, timeLeft:60, timer:null, used:new Set(), task:null, input:'', history:[] };
 
-// ── ACCENT HELPERS ─────────────────────────────────────────────
-function setAccent(color) {
-  document.documentElement.style.setProperty('--accent', color);
-}
+// ── ACCENT ─────────────────────────────────────────────────────
+const setAccent = c => document.documentElement.style.setProperty('--accent', c);
 
 // ── SCREENS ────────────────────────────────────────────────────
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
   document.getElementById(id).classList.remove('hidden');
-  state.screen = id;
 }
 
 // ── HOME ───────────────────────────────────────────────────────
 function initHome() {
   setAccent('#4cc9f0');
-  for (const [id, cfg] of Object.entries(CATS)) {
+  for (const [id,cfg] of Object.entries(CATS)) {
     const hs = loadHS(cfg.hsKey);
-    document.getElementById(`hs-${id}`).textContent = hs > 0 ? hs + ' pont' : '—';
+    document.getElementById(`hs-${id}`).textContent = hs > 0 ? hs+' pont' : '—';
   }
   showScreen('home');
 }
@@ -771,222 +426,200 @@ function initHome() {
 function startGame(catId) {
   const cfg = CATS[catId];
   setAccent(cfg.color);
-  state.cat = catId;
-  state.score = 0;
-  state.timeLeft = 60;
-  state.usedKeys = new Set();
-  state.input = '';
-
-  // rebuild keyboard (dot or no dot)
+  Object.assign(S, { cat:catId, score:0, timeLeft:60, used:new Set(), input:'', history:[] });
   rebuildKeyboard(cfg.hasDot);
-
   document.getElementById('cat-badge').textContent = cfg.name;
-  document.getElementById('result-cat-badge').textContent = cfg.name;
-  updateScoreDisplay();
-  updateTimerDisplay();
-  updateProgress();
-
+  updateScore(); updateTimer(); updateProgress();
   nextTask();
   showScreen('game');
-
-  // start countdown
-  clearInterval(state.timer);
-  state.timer = setInterval(tick, 1000);
+  clearInterval(S.timer);
+  S.timer = setInterval(tick, 1000);
 }
 
 function tick() {
-  state.timeLeft--;
-  updateTimerDisplay();
-  updateProgress();
-  if (state.timeLeft <= 0) endGame();
+  S.timeLeft--;
+  updateTimer(); updateProgress();
+  if (S.timeLeft <= 0) endGame();
 }
 
-function updateTimerDisplay() {
+function updateTimer() {
   const el = document.getElementById('timer-num');
-  el.textContent = state.timeLeft;
-  el.classList.toggle('danger', state.timeLeft <= 10);
+  el.textContent = S.timeLeft;
+  el.classList.toggle('danger', S.timeLeft <= 10);
 }
 
 function updateProgress() {
-  const fill = document.getElementById('progress-fill');
-  fill.style.width = (state.timeLeft / 60 * 100) + '%';
-  fill.style.backgroundColor = state.timeLeft <= 10 ? 'var(--danger)' : 'var(--accent)';
+  const f = document.getElementById('progress-fill');
+  f.style.width = (S.timeLeft/60*100)+'%';
+  f.style.backgroundColor = S.timeLeft <= 10 ? 'var(--danger)' : 'var(--accent)';
 }
 
-function updateScoreDisplay() {
-  document.getElementById('score-num').textContent = state.score;
-}
+function updateScore() { document.getElementById('score-num').textContent = S.score; }
 
 function nextTask() {
-  state.input = '';
-  updateAnswerDisplay();
-  state.currentTask = CATS[state.cat].generate(state.usedKeys);
-  document.getElementById('task-eq').textContent = state.currentTask.display;
+  S.input = ''; updateAnswerBox();
+  S.task = CATS[S.cat].generate(S.used);
+  document.getElementById('task-eq').textContent = S.task.display;
 }
 
-function updateAnswerDisplay() {
-  const el = document.getElementById('answer-text');
-  el.textContent = state.input;
-  const box = document.getElementById('answer-box');
-  box.classList.toggle('has-input', state.input.length > 0);
+function updateAnswerBox() {
+  document.getElementById('answer-text').textContent = S.input;
+  document.getElementById('answer-box').classList.toggle('has-input', S.input.length > 0);
 }
 
-function handleKey(val) {
-  if (val === 'OK') {
-    submitAnswer();
-  } else if (val === 'DEL') {
-    if (state.input.length > 0)
-      state.input = state.input.slice(0, -1);
-    updateAnswerDisplay();
-  } else if (val === '.') {
-    if (!state.input.includes('.') && state.input.length < 6)
-      state.input += '.';
-    updateAnswerDisplay();
-  } else {
-    // digit
-    if (state.input.length < 6) {
-      // prevent leading zeros (except "0.")
-      if (state.input === '0' && val !== '.') state.input = val;
-      else state.input += val;
-    }
-    updateAnswerDisplay();
+function submit() {
+  if (!S.input) return;
+  const userNum = parseFloat(S.input.replace(',','.'));
+  const corrNum = parseFloat(S.task.answer);
+  const correct = !isNaN(userNum) && Math.abs(userNum - corrNum) < 0.001;
+
+  S.history.push({ display:S.task.display, userAnswer:S.input, correctAnswer:S.task.answer, correct });
+
+  if (correct) {
+    S.score++;
+    updateScore();
+    // bump animation
+    const el = document.getElementById('score-num');
+    el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
+    setTimeout(() => el.classList.remove('bump'), 150);
   }
+  nextTask(); // hibás esetén is tovább
 }
 
-function submitAnswer() {
-  if (!state.input) return;
-  const userNum = parseFloat(state.input.replace(',', '.'));
-  const correctNum = parseFloat(state.currentTask.answer);
-  if (!isNaN(userNum) && Math.abs(userNum - correctNum) < 0.001) {
-    // correct!
-    state.score++;
-    updateScoreDisplay();
-    bumpScore();
-    nextTask();
-  } else {
-    // wrong – move to next task
-    nextTask();
-  }
-}
-
-function bumpScore() {
-  const el = document.getElementById('score-num');
-  el.classList.remove('bump');
-  void el.offsetWidth;
-  el.classList.add('bump');
-  setTimeout(() => el.classList.remove('bump'), 150);
-}
-
+// ── END ────────────────────────────────────────────────────────
 function endGame() {
-  clearInterval(state.timer);
-  const cfg = CATS[state.cat];
+  clearInterval(S.timer);
+  const cfg = CATS[S.cat];
   const hs = loadHS(cfg.hsKey);
-  const isRecord = state.score > hs;
-  if (isRecord) saveHS(cfg.hsKey, state.score);
-  const bestScore = isRecord ? state.score : hs;
+  const isRec = S.score > hs;
+  if (isRec) saveHS(cfg.hsKey, S.score);
 
-  document.getElementById('result-num').textContent = state.score;
-  document.getElementById('result-label').textContent =
-    state.score === 1 ? 'feladatot oldottál meg!' : 'feladatot oldottál meg!';
-  document.getElementById('result-hs-val').textContent = bestScore + ' pont';
-  document.getElementById('new-record').classList.toggle('hidden', !isRecord);
+  document.getElementById('result-cat-badge').textContent = cfg.name;
+  document.getElementById('result-num').textContent = S.score;
+  document.getElementById('result-hs-val').textContent = (isRec ? S.score : hs) + ' pont';
+  document.getElementById('new-record').classList.toggle('hidden', !isRec);
+  document.getElementById('result-stars').textContent = '⭐'.repeat(S.score < 5 ? 1 : S.score < 12 ? 2 : 3);
 
-  // stars
-  const stars = state.score < 5 ? 1 : state.score < 12 ? 2 : 3;
-  document.getElementById('result-stars').textContent = '⭐'.repeat(stars);
-
+  renderHistory();
   showScreen('result');
-  initHome(); // refresh highscores
+  document.getElementById('result').scrollTop = 0;
+  initHome();
+}
+
+// ── HISTORY ────────────────────────────────────────────────────
+function renderHistory() {
+  const list = document.getElementById('history-list');
+  list.innerHTML = '';
+
+  if (!S.history.length) {
+    list.innerHTML = '<div style="color:var(--text-dim);font-size:14px;text-align:center;padding:12px 0">Egyetlen feladatot sem küldtél be.</div>';
+    return;
+  }
+
+  S.history.forEach(h => {
+    const item = document.createElement('div');
+    item.className = 'history-item ' + (h.correct ? 'correct' : 'wrong');
+
+    // ikon
+    const icon = document.createElement('div');
+    icon.className = 'history-icon';
+    icon.textContent = h.correct ? '✓' : '✗';
+
+    // feladat szövege
+    const eq = document.createElement('div');
+    eq.className = 'history-eq';
+    eq.textContent = h.display;
+
+    // amit a gyerek beírt
+    const user = document.createElement('div');
+    user.className = 'history-user';
+    user.textContent = h.userAnswer;
+
+    item.appendChild(icon);
+    item.appendChild(eq);
+    item.appendChild(user);
+
+    // hibás esetén: nyíl + helyes válasz
+    if (!h.correct) {
+      const arrow = document.createElement('div');
+      arrow.className = 'history-arrow';
+      arrow.textContent = '→';
+
+      const corr = document.createElement('div');
+      corr.className = 'history-correct-ans';
+      corr.textContent = h.correctAnswer;
+
+      item.appendChild(arrow);
+      item.appendChild(corr);
+    }
+
+    list.appendChild(item);
+  });
 }
 
 // ── KEYBOARD ───────────────────────────────────────────────────
-function rebuildKeyboard(hasDot) {
-  const grid = document.getElementById('kb-grid');
-  const rows = hasDot
-    ? ['1','2','3','4','5','6','7','8','9','DEL','.','0','OK']
-    : ['1','2','3','4','5','6','7','8','9','DEL','0','OK'];
-
-  // with dot: 13 buttons in 4 rows (3+3+3+4) – use 3-col grid
-  // without dot: 12 buttons in 4 rows (3+3+3+3)
-
-  grid.innerHTML = '';
-
-  if (hasDot) {
-    // 3 rows of 3 + bottom row of 4 (DEL . 0 OK)
-    const digits = ['1','2','3','4','5','6','7','8','9'];
-    digits.forEach(d => grid.appendChild(makeKbBtn(d, d)));
-    // bottom row with 4 items – change grid temporarily
-    grid.style.gridTemplateColumns = 'repeat(3, 1fr)';
-    const bottomRow = document.createElement('div');
-    bottomRow.style.cssText = 'display:flex;gap:10px;grid-column:1/-1;';
-    ['DEL', '.', '0', 'OK'].forEach(v => bottomRow.appendChild(makeKbBtn(v, v, 'flex:1')));
-    grid.appendChild(bottomRow);
-  } else {
-    grid.style.gridTemplateColumns = 'repeat(3, 1fr)';
-    ['1','2','3','4','5','6','7','8','9','DEL','0','OK'].forEach(v => {
-      grid.appendChild(makeKbBtn(v, v));
-    });
+function handleKey(val) {
+  if (val === 'OK')  { submit(); return; }
+  if (val === 'DEL') { S.input = S.input.slice(0,-1); updateAnswerBox(); return; }
+  if (val === '.') {
+    if (!S.input.includes('.') && S.input.length < 7) { S.input += '.'; updateAnswerBox(); }
+    return;
+  }
+  if (S.input.length < 7) {
+    S.input = (S.input === '0') ? val : S.input + val;
+    updateAnswerBox();
   }
 }
 
-function makeKbBtn(label, val, extraStyle) {
+function makeKbBtn(val) {
   const btn = document.createElement('button');
   btn.className = 'kb-btn' +
-    (val === 'OK' ? ' kb-ok' : '') +
-    (val === 'DEL' ? ' kb-del' : '') +
-    (val === '.' ? ' kb-dot' : '');
-  btn.textContent = label === 'DEL' ? '⌫' : label;
-  btn.dataset.v = val;
-  if (extraStyle) btn.style.cssText = extraStyle;
-
-  // touchstart for iOS responsiveness
-  btn.addEventListener('touchstart', e => {
-    e.preventDefault();
-    btn.classList.add('pressed');
-    handleKey(val);
-  }, { passive: false });
-
-  btn.addEventListener('touchend', e => {
-    e.preventDefault();
-    btn.classList.remove('pressed');
-  }, { passive: false });
-
-  // fallback for non-touch
-  btn.addEventListener('mousedown', e => {
-    e.preventDefault();
-    handleKey(val);
-  });
-
+    (val==='OK'  ? ' kb-ok'  : '') +
+    (val==='DEL' ? ' kb-del' : '') +
+    (val==='.'   ? ' kb-dot' : '');
+  btn.textContent = val==='DEL' ? '⌫' : val;
+  btn.addEventListener('touchstart', e => { e.preventDefault(); btn.classList.add('pressed'); handleKey(val); }, {passive:false});
+  btn.addEventListener('touchend',   e => { e.preventDefault(); btn.classList.remove('pressed'); }, {passive:false});
+  btn.addEventListener('mousedown',  e => { e.preventDefault(); handleKey(val); });
   return btn;
 }
 
-// ── CATEGORY BUTTONS ───────────────────────────────────────────
+function rebuildKeyboard(hasDot) {
+  const grid = document.getElementById('kb-grid');
+  grid.innerHTML = '';
+  grid.style.gridTemplateColumns = 'repeat(3, 1fr)';
+  ['1','2','3','4','5','6','7','8','9'].forEach(d => grid.appendChild(makeKbBtn(d)));
+
+  if (hasDot) {
+    // 4 gomb az alsó sorban
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:10px;grid-column:1/-1;';
+    ['DEL','.','0','OK'].forEach(v => {
+      const b = makeKbBtn(v);
+      b.style.flex = '1'; b.style.aspectRatio = '1.4';
+      row.appendChild(b);
+    });
+    grid.appendChild(row);
+  } else {
+    ['DEL','0','OK'].forEach(v => grid.appendChild(makeKbBtn(v)));
+  }
+}
+
+// ── WIRING ─────────────────────────────────────────────────────
 document.querySelectorAll('.cat-btn').forEach(btn => {
-  btn.addEventListener('touchstart', e => {
-    e.preventDefault();
-    startGame(btn.dataset.cat);
-  }, { passive: false });
+  btn.addEventListener('touchstart', e => { e.preventDefault(); startGame(btn.dataset.cat); }, {passive:false});
   btn.addEventListener('click', () => startGame(btn.dataset.cat));
 });
+['btn-retry','btn-home'].forEach(id => {
+  const el = document.getElementById(id);
+  const fn = id==='btn-retry' ? () => startGame(S.cat) : () => initHome();
+  el.addEventListener('touchstart', e => { e.preventDefault(); fn(); }, {passive:false});
+  el.addEventListener('click', fn);
+});
 
-// ── RESULT BUTTONS ─────────────────────────────────────────────
-document.getElementById('btn-retry').addEventListener('touchstart', e => {
-  e.preventDefault(); startGame(state.cat);
-}, { passive: false });
-document.getElementById('btn-retry').addEventListener('click', () => startGame(state.cat));
-
-document.getElementById('btn-home').addEventListener('touchstart', e => {
-  e.preventDefault(); initHome();
-}, { passive: false });
-document.getElementById('btn-home').addEventListener('click', () => initHome());
-
-// ── INIT ───────────────────────────────────────────────────────
+// ── BOOT ───────────────────────────────────────────────────────
 initHome();
-
-// ── SERVICE WORKER ─────────────────────────────────────────────
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
-}
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
 </html>
