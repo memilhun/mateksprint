@@ -404,9 +404,12 @@ const CATS = {
     generate(u) {
       return tryGen(u, 600, () => {
         const b = [10,100,1000][rand(0,2)];
-        const aInt = rand(0, 1000000); // 0..1000.000
-        const aRaw = aInt / 1000;
-        const aStr = fmtResult(aRaw);
+        const dec = rand(1,3); // 1-3 tizedesjegy
+        const scale = Math.pow(10, dec);
+        const aInt = rand(0, 1000 * scale); // 0..1000.000
+        const aRaw = aInt / scale;
+        const aStr = aRaw.toFixed(dec).replace(/\.0+$/, '').replace(/(\.\d*?)0+$/, '$1');
+        // aStr most azonos 1-3 tizedesjegyű, nem végződik fölösleges nullával
         const ansStr = fmtResult(aRaw / b);
         return { display:`${aStr} ÷ ${b} =`, answer:ansStr, key:`${aStr}d${b}` };
       });
