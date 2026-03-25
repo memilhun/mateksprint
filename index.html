@@ -489,7 +489,9 @@ function submit() {
   if (!S.input) return;
   const userNum = parseFloat(S.input.replace(',','.'));
   const corrNum = parseFloat(S.task.answer);
-  const correct = !isNaN(userNum) && Math.abs(userNum - corrNum) < 0.001;
+  const userStr = fmtResult(userNum);
+  const corrStr = fmtResult(corrNum);
+  const correct = !isNaN(userNum) && userStr === corrStr;
 
   S.history.push({ display:S.task.display, userAnswer:S.input, correctAnswer:S.task.answer, correct });
 
@@ -583,7 +585,7 @@ function handleKey(val) {
     if (!S.input.includes('.') && S.input.length < 7) { S.input += '.'; updateAnswerBox(); }
     return;
   }
-  if (S.input.length < 7) {
+  if (S.input.length < 8) {
     S.input = (S.input === '0') ? val : S.input + val;
     updateAnswerBox();
   }
