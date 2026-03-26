@@ -208,25 +208,41 @@ function startGame(id) {
 }
 
 function nextTask() {
-  State.input = ''; State.isInputLocked = false;
+  State.input = ''; 
+  State.isInputLocked = false;
   document.getElementById('answer-text').textContent = '';
   document.getElementById('answer-box').classList.remove('has-input');
-  let selectedTask = null;
   
-  if (State.mistakes.length > 0 && Math.random() < 0.25) {
-    selectedTask = State.mistakes[rand(0, State.mistakes.length - 1)];
-  } else {
+  let selectedTask = null;
+  const lastKey = State.task ? State.task.k : null; // Elmentjük az előző feladat azonosítóját
+
+  // 1. Megpróbálunk hibát ismételni, de CSAK ha nem az volt az előző
+  if (State.mistakes.length > 0 && Math.random() < 0.3) {
+    const validMistakes = State.mistakes.filter(m => m.k !== lastKey);
+    if (validMistakes.length > 0) {
+      selectedTask = validMistakes[rand(0, validMistakes.length - 1)];
+    }
+  }
+
+  // 2. Ha nem volt alkalmas hiba, generálunk újat
+  if (!selectedTask) {
     let attempts = 0;
-    while (attempts < 12) {
+    while (attempts < 15) {
       const t = CATS[State.cat].gen(State.level);
-      if (!State.recentTasks.includes(t.k)) { selectedTask = t; break; }
+      // Ne legyen ugyanaz, mint az előző, ÉS ne legyen benne a recentTasks-ban
+      if (t.k !== lastKey && !State.recentTasks.includes(t.k)) { 
+        selectedTask = t; 
+        break; 
+      }
       attempts++;
     }
     if (!selectedTask) selectedTask = CATS[State.cat].gen(State.level);
   }
+
   State.task = selectedTask;
   State.recentTasks.push(selectedTask.k);
   if (State.recentTasks.length > 8) State.recentTasks.shift();
+  
   document.getElementById('task-eq').textContent = `${State.task.q} = ?`;
   State.startTime = performance.now();
 }
