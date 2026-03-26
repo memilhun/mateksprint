@@ -56,7 +56,7 @@
     }
     .screen.hidden { opacity: 0; pointer-events: none; transform: scale(.96); }
 
-    /* --- HOME - NÖVELT MÉRETEK --- */
+    /* --- HOME --- */
     #home { justify-content: flex-start; overflow-y: auto; }
     .home-header { width: 100%; text-align: center; padding: 24px 0 32px; flex-shrink: 0; }
     .logo {
@@ -201,7 +201,7 @@
 
 <script>
 /**
- * MatekSprint Pro - Engine
+ * MatekSprint Pro - Engine with Recent Task Buffer
  */
 
 const CATS = {
@@ -220,7 +220,8 @@ const CATS = {
 let State = {
   cat: null, score: 0, time: 60, timerInterval: null, task: null,
   input: '', history: [], mistakes: [], level: 1, streak: 0,
-  startTime: 0, isInputLocked: false
+  startTime: 0, isInputLocked: false,
+  recentTasks: [] // FIFO Buffer for anti-duplication
 };
 
 const rand = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
@@ -254,7 +255,8 @@ function startGame(id) {
   State = {
     cat: id, score: 0, time: 60, timerInterval: null, task: null,
     input: '', history: [], mistakes: [], level: 1, streak: 0,
-    startTime: 0, isInputLocked: false
+    startTime: 0, isInputLocked: false,
+    recentTasks: []
   };
 
   const catCfg = CATS[id];
@@ -284,12 +286,39 @@ function nextTask() {
   State.isInputLocked = false;
   document.getElementById('answer-text').textContent = '';
   document.getElementById('answer-box').classList.remove('has-input');
+
+  let selectedTask = null;
+
+  // 1. Check for mistakes first (30% chance)
   if (State.mistakes.length > 0 && Math.random() < 0.3) {
-    State.task = State.mistakes[rand(0, State.mistakes.length - 1)];
+    selectedTask = State.mistakes[rand(0, State.mistakes.length - 1)];
   } else {
-    const t = CATS[State.cat].gen(State.level);
-    State.task = { q: t.q, a: t.a, k: t.k };
+    // 2. Generate new unique task using Buffer
+    let attempts = 0;
+    while (attempts < 10) {
+      const t = CATS[State.cat].gen(State.level);
+      const potentialTask = { q: t.q, a: t.a, k: t.k };
+      
+      // Check if it was recently shown
+      if (!State.recentTasks.includes(potentialTask.k)) {
+        selectedTask = potentialTask;
+        break;
+      }
+      attempts++;
+    }
+    // Fallback if no unique found in 10 tries
+    if (!selectedTask) {
+      const t = CATS[State.cat].gen(State.level);
+      selectedTask = { q: t.q, a: t.a, k: t.k };
+    }
   }
+
+  State.task = selectedTask;
+  
+  // Add to Buffer and maintain size (max 6 to prevent lockout on low levels)
+  State.recentTasks.push(selectedTask.k);
+  if (State.recentTasks.length > 6) State.recentTasks.shift();
+
   document.getElementById('task-eq').textContent = `${State.task.q} = ?`;
   State.startTime = performance.now();
 }
