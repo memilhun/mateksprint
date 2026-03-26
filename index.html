@@ -57,7 +57,14 @@
     .history-list { display: flex; flex-direction: column; gap: 10px; width: 100%; margin-top: 20px; }
     .history-item { display: flex; align-items: center; background: var(--surface); padding: 14px; border-radius: 14px; border-left: 5px solid var(--danger); gap: 12px; font-size: 15px; }
     .history-item.correct { border-left-color: var(--ok); }
-    .btn-primary { width: 100%; max-width: 320px; padding: 20px; border-radius: 20px; background: var(--accent); color: #fff; font-weight: 800; border: none; font-size: 20px; cursor: pointer; }
+    
+    .btn-primary { width: 100%; max-width: 320px; padding: 20px; border-radius: 20px; background: var(--accent); color: #fff; font-weight: 800; border: none; font-size: 20px; cursor: pointer; transition: transform .1s; }
+    .btn-primary:active { transform: scale(0.96); }
+    
+    /* Új gomb stílus a Vissza a menübe gombhoz */
+    .btn-secondary { width: 100%; max-width: 320px; padding: 20px; border-radius: 20px; background: var(--surface2); color: var(--text); font-weight: 800; border: 2px solid var(--surface2); font-size: 20px; cursor: pointer; transition: transform .1s; }
+    .btn-secondary:active { transform: scale(0.96); }
+
     .task-eq.word-problem { font-size: clamp(18px, 5vw, 24px); line-height: 1.4; padding: 0 10px; max-width: 90%; font-family: var(--font-ui); }
   </style>
 </head>
@@ -93,21 +100,20 @@
       <div id="new-record" style="color:#ffd60a; font-weight:900; display:none; margin-bottom: 8px; font-size: 18px;">🏆 ÚJ REKORD!</div>
       <div class="stats-grid">
         <div class="stat-box">Pontosság<b id="res-acc">0%</b></div>
-        <div class="stat-box">Átlagidő<b id="res-time">0ms</b></div>
+        <div class="stat-box">Összesen<b id="res-total">0 db</b></div> <div class="stat-box">Átlagidő<b id="res-time">0ms</b></div>
+        <div class="stat-box">Elért szint<b id="res-level">1</b></div>
       </div>
-      <div style="margin-top:12px; font-size:14px;">Elért szint: <b id="res-level" style="color:var(--accent)">1</b></div>
     </div>
     <div class="result-btns" style="margin-top:24px; width:100%; display:flex; flex-direction:column; align-items:center; gap:12px;">
       <button class="btn-primary" id="btn-retry">Újra!</button>
-      <button style="background:none; border:none; color:var(--text-dim); cursor:pointer; padding: 12px; font-size: 16px; font-weight: 700;" id="btn-home">Vissza a menübe</button>
-    </div>
+      <button class="btn-secondary" id="btn-home">Vissza a menübe</button> </div>
   </div>
   <div class="history-wrap" style="width: 100%; max-width: 400px; padding-bottom: 50px;"><div class="history-list" id="history-list"></div></div>
 </div>
 
 <script>
 /**
- * MatekSprint Pro - Phase 2 & 3 Fixed
+ * MatekSprint Pro - Pedagogical Edition
  */
 
 const WORD_PROBLEM_TEMPLATES = [
@@ -132,7 +138,7 @@ const WORD_PROBLEM_TEMPLATES = [
       };
     }
   },
-  { // KÖTÉL (JAVÍTOTT)
+  { // KÖTÉL
     gen: () => {
       const total = (rand(10, 40) / 10);
       return {
@@ -264,7 +270,6 @@ function nextTask() {
     if (State.recentTasks.length > 8) State.recentTasks.shift();
   }
   
-  // DINAMIKUS BILLENTYŰZET ÚJRATÖLTÉS
   rebuildKeyboard();
 
   const eqEl = document.getElementById('task-eq');
@@ -288,7 +293,6 @@ function handleKey(v) {
 
 function rebuildKeyboard() {
   const grid = document.getElementById('kb-grid'); grid.innerHTML = '';
-  // Ellenőrizzük, kell-e tizedesvessző: tizedes kategória VAGY a válaszban van pont
   const needsDot = ['tszorz', 'toszt', 'tort'].includes(State.cat) || (State.task && State.task.a.includes('.'));
   
   const keys = [1, 2, 3, 4, 5, 6, 7, 8, 9, 'DEL', 0, needsDot ? ',' : 'OK'];
@@ -315,7 +319,7 @@ function submit() {
   State.isInputLocked = true;
   const rt = performance.now() - State.startTime;
   const isCorrect = fmt(parseFloat(State.input.replace(',', '.'))) === State.task.a;
-  State.history.push({ q: State.task.isWord ? State.task.q : State.task.q, ua: State.input, ca: State.task.a, ok: isCorrect, rt });
+  State.history.push({ q: State.task.q, ua: State.input, ca: State.task.a, ok: isCorrect, rt });
   
   let nextDelay = 150;
   if (isCorrect) {
@@ -338,22 +342,43 @@ function showLevelUp() { const pop = document.getElementById('level-up-pop'); po
 function endGame() {
   if (State.timerInterval) clearInterval(State.timerInterval);
   const stats = getStats(State.cat);
-  const total = State.history.length; const correct = State.history.filter(h => h.ok).length;
+  const total = State.history.length; 
+  const correct = State.history.filter(h => h.ok).length;
   const acc = total ? Math.round((correct / total) * 100) : 0;
   const avg = total ? Math.round(State.history.reduce((s, h) => s + h.rt, 0) / total) : 0;
-  localStorage.setItem('stats_' + State.cat, JSON.stringify({ hs: Math.max(stats.hs, State.score), avgT: stats.plays === 0 ? avg : Math.round((stats.avgT + avg) / 2), acc: stats.plays === 0 ? acc : Math.round((stats.acc + acc) / 2), plays: (stats.plays || 0) + 1 }));
+  
+  localStorage.setItem('stats_' + State.cat, JSON.stringify({ 
+    hs: Math.max(stats.hs, State.score), 
+    avgT: stats.plays === 0 ? avg : Math.round((stats.avgT + avg) / 2), 
+    acc: stats.plays === 0 ? acc : Math.round((stats.acc + acc) / 2), 
+    plays: (stats.plays || 0) + 1 
+  }));
+
   document.getElementById('result-num').textContent = State.score;
-  document.getElementById('res-acc').textContent = acc + '%'; document.getElementById('res-time').textContent = avg + 'ms';
+  document.getElementById('res-acc').textContent = acc + '%';
+  document.getElementById('res-total').textContent = total + ' db';
+  document.getElementById('res-time').textContent = avg + 'ms';
   document.getElementById('res-level').textContent = State.level;
-  renderHistory(); showScreen('result');
+  
+  renderHistory(); 
+  showScreen('result');
 }
 
 function renderHistory() {
-  const container = document.getElementById('history-list'); container.innerHTML = '';
-  [...State.history].reverse().slice(0, 10).forEach(h => {
-    const item = document.createElement('div'); item.className = `history-item ${h.ok ? 'correct' : ''}`;
-    const shortQ = h.q.length > 35 ? h.q.substring(0, 32) + '...' : h.q;
-    item.innerHTML = `<div style="flex:1">${shortQ} = <b>${h.ua.replace('.', ',')}</b> ${!h.ok ? `<span style="color:var(--text-dim); font-size: 0.9em;"> (${h.ca.replace('.', ',')})</span>` : ''}</div>`;
+  const container = document.getElementById('history-list'); 
+  container.innerHTML = '';
+  // slice(0, 10) eltávolítva, hogy minden feladat látszódjon
+  [...State.history].reverse().forEach(h => {
+    const item = document.createElement('div'); 
+    item.className = `history-item ${h.ok ? 'correct' : ''}`;
+    const shortQ = h.q.length > 45 ? h.q.substring(0, 42) + '...' : h.q;
+    item.innerHTML = `
+      <div style="flex:1">
+        ${shortQ} = <b>${h.ua.replace('.', ',')}</b> 
+        ${!h.ok ? `<span style="color:var(--text-dim); font-size: 0.9em;"> (${h.ca.replace('.', ',')})</span>` : ''}
+      </div>
+      <div style="font-size:11px; opacity:0.6;">${Math.round(h.rt)}ms</div>
+    `;
     container.appendChild(item);
   });
 }
