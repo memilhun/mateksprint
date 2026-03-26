@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>MatekSprint Pro - Bugfixed</title>
+  <title>MatekSprint Pro - Pedagogical Edition</title>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Nunito:wght@500;700;800;900&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -34,8 +34,14 @@
     .progress-fill { height: 100%; width: 100%; background: var(--accent); transition: width 1.05s linear; }
     .task-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; width: 100%; position: relative; }
     .task-eq { font-family: var(--font-num); font-size: clamp(36px, 12vw, 56px); font-weight: 700; color: var(--text); text-align: center; }
-    #level-up-pop { position: absolute; top: 20%; font-weight: 900; font-size: 28px; color: #ffd60a; text-shadow: 0 0 15px rgba(255,214,10,0.5); pointer-events: none; opacity: 0; transform: translateY(20px); transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    #level-up-pop { position: absolute; top: 15%; font-weight: 900; font-size: 28px; color: #ffd60a; text-shadow: 0 0 15px rgba(255,214,10,0.5); pointer-events: none; opacity: 0; transform: translateY(20px); transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 20; }
     #level-up-pop.show { opacity: 1; transform: translateY(0); }
+    
+    /* Phase 1: Tip Popup Style */
+    #tip-pop { position: absolute; bottom: 10%; background: var(--surface2); border: 2px solid var(--accent); padding: 14px 20px; border-radius: 16px; font-size: 14px; color: var(--text); max-width: 85%; text-align: center; opacity: 0; pointer-events: none; transform: translateY(10px); transition: all 0.3s; z-index: 10; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    #tip-pop.show { opacity: 1; transform: translateY(0); }
+    #tip-pop b { color: var(--accent); display: block; margin-bottom: 4px; font-size: 12px; text-transform: uppercase; }
+
     .answer-box { font-family: var(--font-num); font-size: 46px; font-weight: 700; color: var(--accent); min-width: 180px; min-height: 80px; background: var(--surface); border: 3px solid color-mix(in srgb, var(--accent) 30%, transparent); border-radius: 20px; display: flex; align-items: center; justify-content: center; }
     .answer-box.has-input { border-color: var(--accent); }
     .cursor { display: inline-block; width: 3px; height: 1em; background: var(--accent); margin-left: 4px; animation: blink .8s step-end infinite; }
@@ -73,6 +79,7 @@
   <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
   <div class="task-area">
     <div id="level-up-pop">LEVEL UP! 🚀</div>
+    <div id="tip-pop"><b>Pro-Tipp</b><span id="tip-text"></span></div>
     <div class="cat-badge" id="cat-badge" style="font-size: 14px; opacity: 0.8; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 800; color: var(--accent);"></div>
     <div class="task-eq" id="task-eq"></div>
     <div class="answer-box" id="answer-box"><span id="answer-text"></span><span class="cursor"></span></div>
@@ -102,26 +109,26 @@
 
 <script>
 /**
- * MatekSprint Pro - Balanced & Bugfixed
+ * MatekSprint Pro - Phase 1: Intelligent Error Analysis
  */
 const CATS = {
   szorzas: { id: 'szorzas', name:'Szorzótábla', color:'#4cc9f0', bBase: 1800, bInc: 200, 
-    gen: (l) => { const a=rand(2, 5+l*2), b=rand(2, 9); return {q:`${a} × ${b}`, a:(a*b).toString(), k:`${a}x${b}`} } },
+    gen: (l) => { const a=rand(2, 5+l*2), b=rand(2, 9); return {q:`${a} × ${b}`, a:(a*b).toString(), k:`${a}x${b}`, p:[a, b]} } },
   osztas: { id: 'osztas', name:'Osztás', color:'#ff9e00', bBase: 2500, bInc: 300,
-    gen: (l) => { const b=rand(2, 6+l), c=rand(2, 8+l); return {q:`${b*c} ÷ ${b}`, a:c.toString(), k:`${b*c}d${b}`} } },
+    gen: (l) => { const b=rand(2, 6+l), c=rand(2, 8+l); return {q:`${b*c} ÷ ${b}`, a:c.toString(), k:`${b*c}d${b}`, p:[b*c, b]} } },
   tszorz: { id: 'tszorz', name:'Tizedes szorzás', color:'#06d6a0', bBase: 3500, bInc: 400,
     gen: (l) => {
       let a, b;
       if (l <= 1) { a = rand(2, 9) / 10; b = rand(2, 9); }
       else if (l === 2) { const m = [10, 100][rand(0, 1)]; a = rand(11, 999) / 10; b = m; }
       else { a = rand(2, 12) / 10; b = rand(2, 5) / 10; }
-      return { q: `${fmt(a)} × ${fmt(b)}`, a: fmt(a * b), k: `${a}x${b}` };
+      return { q: `${fmt(a)} × ${fmt(b)}`, a: fmt(a * b), k: `${a}x${b}`, p:[a, b] };
     } 
   },
   toszt: { id: 'toszt', name:'Tizedes osztás', color:'#ff6b9d', bBase: 4500, bInc: 500,
-    gen: (l) => { const c=rand(1,30+(l*10)), b=rand(2,5); return {q:`${fmt(c*b/10)} ÷ ${b}`, a:fmt(c/10), k:`${c}d${b}`} } },
+    gen: (l) => { const c=rand(1,30+(l*10)), b=rand(2,5); return {q:`${fmt(c*b/10)} ÷ ${b}`, a:fmt(c/10), k:`${c}d${b}`, p:[c*b/10, b]} } },
   tort: { id: 'tort', name:'Törtek', color:'#ffd166', bBase: 5500, bInc: 200,
-    gen: (l) => { const d=[2,4,5,8,10,20,25][Math.min(6, l)]; const n=rand(1,d-1); return {q:`${n} / ${d}`, a:fmt(n/d), k:`${n}/${d}`} } }
+    gen: (l) => { const d=[2,4,5,8,10,20,25][Math.min(6, l)]; const n=rand(1,d-1); return {q:`${n} / ${d}`, a:fmt(n/d), k:`${n}/${d}`, p:[n, d]} } }
 };
 
 let State = { cat: null, score: 0, time: 60, timerInterval: null, task: null, input: '', history: [], mistakes: [], level: 1, streak: 0, startTime: 0, isInputLocked: false, recentTasks: [] };
@@ -129,6 +136,44 @@ const rand = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
 const fmt = (n) => parseFloat(Number(n).toFixed(8)).toString();
 
 function getStats(id) { try { return JSON.parse(localStorage.getItem('stats_' + id)) || { hs: 0, avgT: 0, acc: 0, plays: 0 }; } catch (e) { return { hs: 0, avgT: 0, acc: 0, plays: 0 }; } }
+
+/**
+ * Phase 1: Error Analyzer
+ */
+function analyzeError(task, userInput, catId) {
+  const val = parseFloat(userInput.replace(',', '.'));
+  const correct = parseFloat(task.a.replace(',', '.'));
+  
+  // Tizedesvessző eltolódás hiba (pl. 0.4 * 2 = 8 vagy 0.08)
+  if (catId === 'tszorz' || catId === 'toszt') {
+    if (val === correct * 10 || val === correct / 10) return "Figyelj a tizedeshelyekre! Számold meg, összesen hány számjegy van a vessző után a feladatban.";
+    if (val === correct * 100 || val === correct / 100) return "Hűha, nagy az eltolódás! Ellenőrizd újra a helyiértékeket.";
+  }
+
+  // Műveleti inverz hiba (Osztás helyett szorzás)
+  if (catId === 'osztas') {
+    if (val === task.p[0] * task.p[1]) return "Ez a számok szorzata! Az osztásnál azt keressük, hányszor fér bele az egyik a másikba.";
+  }
+  
+  // Műveleti inverz hiba (Szorzás helyett osztás)
+  if (catId === 'szorzas') {
+    if (val === task.p[0] / task.p[1] || val === task.p[1] / task.p[0]) return "Összekeverted az osztást a szorzással?";
+  }
+
+  // Tizedes pontosság (pl. 0.25 helyett 0.2)
+  if (catId === 'tort' && Math.abs(val - correct) < 0.2) {
+    return "Majdnem! Próbáld pontosabban kiszámolni a tizedesjegyeket.";
+  }
+
+  return null;
+}
+
+function showTip(msg) {
+  const pop = document.getElementById('tip-pop');
+  document.getElementById('tip-text').textContent = msg;
+  pop.classList.add('show');
+  setTimeout(() => pop.classList.remove('show'), 3500);
+}
 
 function renderHome() {
   const container = document.getElementById('cat-list'); container.innerHTML = '';
@@ -193,9 +238,10 @@ function submit() {
   const isCorrect = fmt(parseFloat(State.input.replace(',', '.'))) === State.task.a;
   State.history.push({ q: State.task.q, ua: State.input, ca: State.task.a, ok: isCorrect, rt });
   
+  let nextDelay = 150;
+
   if (isCorrect) {
     State.streak++;
-    // JAVÍTÁS: Sikeres válasz esetén töröljük a hibák közül végleg
     State.mistakes = State.mistakes.filter(m => m.k !== State.task.k);
     
     const cat = CATS[State.cat];
@@ -211,8 +257,15 @@ function submit() {
     State.streak = 0;
     if (!State.mistakes.find(m => m.k === State.task.k)) State.mistakes.push(State.task);
     if (State.level > 1) State.level--;
+    
+    // Phase 1: Analízis futtatása hiba esetén
+    const tip = analyzeError(State.task, State.input, State.cat);
+    if (tip) {
+      showTip(tip);
+      nextDelay = 2200; // Hosszabb szünet, hogy elolvashassa a tippet
+    }
   }
-  setTimeout(nextTask, 150);
+  setTimeout(nextTask, nextDelay);
 }
 
 function showLevelUp() { const pop = document.getElementById('level-up-pop'); pop.textContent = `SZINT ${State.level} 🚀`; pop.classList.add('show'); setTimeout(() => pop.classList.remove('show'), 1500); }
