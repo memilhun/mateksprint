@@ -3,11 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>MatekSprint Pro - Balanced</title>
+  <title>MatekSprint Pro - Bugfixed</title>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Nunito:wght@500;700;800;900&display=swap" rel="stylesheet">
   <style>
-    /* ... (A stílusok változatlanok a korábbi mobil-optimalizált verzióból) ... */
-    /* Ide másold be a korábbi <style> blokkot a betűméret-növeléssel együtt */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg: #0f0f1a; --surface: #1a1a2e; --surface2: #252540; --text: #f0f0ff; --text-dim: #8888aa; --c1: #4cc9f0; --c2: #ff9e00; --c3: #06d6a0; --c4: #ff6b9d; --danger: #ff4d6d; --ok: #06d6a0; --font-ui: 'Nunito', sans-serif; --font-num: 'Space Mono', monospace; --safe-top: env(safe-area-inset-top, 0px); --safe-bot: env(safe-area-inset-bottom, 0px); --accent: #4cc9f0; }
     html, body { height: 100%; width: 100%; overflow: hidden; touch-action: manipulation; -webkit-tap-highlight-color: transparent; font-family: var(--font-ui); background: var(--bg); color: var(--text); }
@@ -63,10 +61,7 @@
 <canvas class="stars-bg" id="stars-canvas"></canvas>
 
 <div class="screen" id="home">
-  <div class="home-header">
-    <div class="logo">MatekSprint</div>
-    <div class="logo-sub">Gyakorolj naponta!</div>
-  </div>
+  <div class="home-header"><div class="logo">MatekSprint</div><div class="logo-sub">Gyakorolj naponta!</div></div>
   <div class="categories" id="cat-list"></div>
 </div>
 
@@ -80,9 +75,7 @@
     <div id="level-up-pop">LEVEL UP! 🚀</div>
     <div class="cat-badge" id="cat-badge" style="font-size: 14px; opacity: 0.8; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 800; color: var(--accent);"></div>
     <div class="task-eq" id="task-eq"></div>
-    <div class="answer-box" id="answer-box">
-      <span id="answer-text"></span><span class="cursor"></span>
-    </div>
+    <div class="answer-box" id="answer-box"><span id="answer-text"></span><span class="cursor"></span></div>
   </div>
   <div class="keyboard"><div class="kb-grid" id="kb-grid"></div></div>
 </div>
@@ -104,16 +97,13 @@
       <button style="background:none; border:none; color:var(--text-dim); cursor:pointer; padding: 12px; font-size: 16px; font-weight: 700;" id="btn-home">Vissza a menübe</button>
     </div>
   </div>
-  <div class="history-wrap" style="width: 100%; max-width: 400px; padding-bottom: 50px;">
-    <div class="history-list" id="history-list"></div>
-  </div>
+  <div class="history-wrap" style="width: 100%; max-width: 400px; padding-bottom: 50px;"><div class="history-list" id="history-list"></div></div>
 </div>
 
 <script>
 /**
- * MatekSprint Pro - Balanced Edition
+ * MatekSprint Pro - Balanced & Bugfixed
  */
-
 const CATS = {
   szorzas: { id: 'szorzas', name:'Szorzótábla', color:'#4cc9f0', bBase: 1800, bInc: 200, 
     gen: (l) => { const a=rand(2, 5+l*2), b=rand(2, 9); return {q:`${a} × ${b}`, a:(a*b).toString(), k:`${a}x${b}`} } },
@@ -134,31 +124,19 @@ const CATS = {
     gen: (l) => { const d=[2,4,5,8,10,20,25][Math.min(6, l)]; const n=rand(1,d-1); return {q:`${n} / ${d}`, a:fmt(n/d), k:`${n}/${d}`} } }
 };
 
-let State = {
-  cat: null, score: 0, time: 60, timerInterval: null, task: null,
-  input: '', history: [], mistakes: [], level: 1, streak: 0,
-  startTime: 0, isInputLocked: false, recentTasks: []
-};
-
+let State = { cat: null, score: 0, time: 60, timerInterval: null, task: null, input: '', history: [], mistakes: [], level: 1, streak: 0, startTime: 0, isInputLocked: false, recentTasks: [] };
 const rand = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
 const fmt = (n) => parseFloat(Number(n).toFixed(8)).toString();
 
-function getStats(id) { 
-  try { return JSON.parse(localStorage.getItem('stats_' + id)) || { hs: 0, avgT: 0, acc: 0, plays: 0 }; } 
-  catch (e) { return { hs: 0, avgT: 0, acc: 0, plays: 0 }; }
-}
+function getStats(id) { try { return JSON.parse(localStorage.getItem('stats_' + id)) || { hs: 0, avgT: 0, acc: 0, plays: 0 }; } catch (e) { return { hs: 0, avgT: 0, acc: 0, plays: 0 }; } }
 
 function renderHome() {
-  const container = document.getElementById('cat-list');
-  container.innerHTML = '';
+  const container = document.getElementById('cat-list'); container.innerHTML = '';
   Object.values(CATS).forEach(cat => {
     const stats = getStats(cat.id);
-    const btn = document.createElement('div');
-    btn.className = 'cat-btn';
-    btn.style.setProperty('--c', cat.color);
+    const btn = document.createElement('div'); btn.className = 'cat-btn'; btn.style.setProperty('--c', cat.color);
     btn.innerHTML = `<div class="cat-name">${cat.name}</div><div class="cat-hs">Rekord: <b>${stats.hs}</b> | Átl: <b>${stats.avgT}ms</b></div>`;
-    btn.onclick = () => startGame(cat.id);
-    container.appendChild(btn);
+    btn.onclick = () => startGame(cat.id); container.appendChild(btn);
   });
   showScreen('home');
 }
@@ -174,12 +152,10 @@ function startGame(id) {
   document.getElementById('timer-num').classList.remove('danger');
   document.getElementById('progress-fill').style.width = '100%';
   rebuildKeyboard(id !== 'szorzas' && id !== 'osztas');
-  nextTask();
-  showScreen('game');
+  nextTask(); showScreen('game');
   State.timerInterval = setInterval(() => {
     State.time--;
-    const timerEl = document.getElementById('timer-num');
-    timerEl.textContent = State.time;
+    const timerEl = document.getElementById('timer-num'); timerEl.textContent = State.time;
     document.getElementById('progress-fill').style.width = (State.time / 60 * 100) + '%';
     if (State.time <= 10) timerEl.classList.add('danger');
     if (State.time <= 0) endGame();
@@ -191,7 +167,8 @@ function nextTask() {
   document.getElementById('answer-text').textContent = '';
   document.getElementById('answer-box').classList.remove('has-input');
   let selectedTask = null;
-  if (State.mistakes.length > 0 && Math.random() < 0.25) { // Csökkentett hiba-esély a jobb flow érdekében
+  
+  if (State.mistakes.length > 0 && Math.random() < 0.25) {
     selectedTask = State.mistakes[rand(0, State.mistakes.length - 1)];
   } else {
     let attempts = 0;
@@ -215,8 +192,12 @@ function submit() {
   const rt = performance.now() - State.startTime;
   const isCorrect = fmt(parseFloat(State.input.replace(',', '.'))) === State.task.a;
   State.history.push({ q: State.task.q, ua: State.input, ca: State.task.a, ok: isCorrect, rt });
+  
   if (isCorrect) {
     State.streak++;
+    // JAVÍTÁS: Sikeres válasz esetén töröljük a hibák közül végleg
+    State.mistakes = State.mistakes.filter(m => m.k !== State.task.k);
+    
     const cat = CATS[State.cat];
     const dynamicBonus = cat.bBase + (State.level * cat.bInc);
     let points = 1;
@@ -224,46 +205,35 @@ function submit() {
     if (State.level > 3) points++;
     State.score += points;
     if (State.streak >= 5 && State.level < 5) { State.level++; State.streak = 0; showLevelUp(); }
-    const el = document.getElementById('score-num');
-    el.textContent = State.score; el.classList.add('bump');
+    const el = document.getElementById('score-num'); el.textContent = State.score; el.classList.add('bump');
     setTimeout(() => el.classList.remove('bump'), 200);
   } else {
     State.streak = 0;
     if (!State.mistakes.find(m => m.k === State.task.k)) State.mistakes.push(State.task);
     if (State.level > 1) State.level--;
   }
-  setTimeout(nextTask, 150); // Kis szünet a válasz után
+  setTimeout(nextTask, 150);
 }
 
-function showLevelUp() {
-  const pop = document.getElementById('level-up-pop');
-  pop.textContent = `SZINT ${State.level} 🚀`;
-  pop.classList.add('show');
-  setTimeout(() => pop.classList.remove('show'), 1500);
-}
+function showLevelUp() { const pop = document.getElementById('level-up-pop'); pop.textContent = `SZINT ${State.level} 🚀`; pop.classList.add('show'); setTimeout(() => pop.classList.remove('show'), 1500); }
 
 function endGame() {
   if (State.timerInterval) clearInterval(State.timerInterval);
   const stats = getStats(State.cat);
-  const total = State.history.length;
-  const correct = State.history.filter(h => h.ok).length;
+  const total = State.history.length; const correct = State.history.filter(h => h.ok).length;
   const acc = total ? Math.round((correct / total) * 100) : 0;
   const avg = total ? Math.round(State.history.reduce((s, h) => s + h.rt, 0) / total) : 0;
   localStorage.setItem('stats_' + State.cat, JSON.stringify({ hs: Math.max(stats.hs, State.score), avgT: stats.plays === 0 ? avg : Math.round((stats.avgT + avg) / 2), acc: stats.plays === 0 ? acc : Math.round((stats.acc + acc) / 2), plays: (stats.plays || 0) + 1 }));
   document.getElementById('result-num').textContent = State.score;
-  document.getElementById('res-acc').textContent = acc + '%';
-  document.getElementById('res-time').textContent = avg + 'ms';
+  document.getElementById('res-acc').textContent = acc + '%'; document.getElementById('res-time').textContent = avg + 'ms';
   document.getElementById('res-level').textContent = State.level;
-  renderHistory();
-  showScreen('result');
+  renderHistory(); showScreen('result');
 }
 
 function renderHistory() {
-  const container = document.getElementById('history-list');
-  container.innerHTML = '';
+  const container = document.getElementById('history-list'); container.innerHTML = '';
   [...State.history].reverse().slice(0, 10).forEach(h => {
-    const item = document.createElement('div');
-    item.className = `history-item ${h.ok ? 'correct' : ''}`;
+    const item = document.createElement('div'); item.className = `history-item ${h.ok ? 'correct' : ''}`;
     item.innerHTML = `<div style="flex:1">${h.q} = <b>${h.ua}</b> ${!h.ok ? `<span style="color:var(--text-dim); font-size: 0.9em;"> (${h.ca})</span>` : ''}</div><div style="font-size:11px; opacity:0.6;">${Math.round(h.rt)}ms</div>`;
     container.appendChild(item);
   });
@@ -279,18 +249,13 @@ function handleKey(v) {
 }
 
 function rebuildKeyboard(showDot) {
-  const grid = document.getElementById('kb-grid');
-  grid.innerHTML = '';
+  const grid = document.getElementById('kb-grid'); grid.innerHTML = '';
   [1, 2, 3, 4, 5, 6, 7, 8, 9, 'DEL', 0, showDot ? ',' : 'OK'].forEach(v => {
     const b = document.createElement('button'); b.className = 'kb-btn' + (v === 'OK' ? ' kb-ok' : '');
-    b.textContent = v === 'DEL' ? '⌫' : v;
-    b.onclick = () => handleKey(v === ',' ? '.' : v);
+    b.textContent = v === 'DEL' ? '⌫' : v; b.onclick = () => handleKey(v === ',' ? '.' : v);
     grid.appendChild(b);
   });
-  if (showDot) {
-    const ok = document.createElement('button'); ok.className = 'kb-btn kb-ok'; ok.style.gridColumn = 'span 3'; ok.textContent = 'OK';
-    ok.onclick = () => handleKey('OK'); grid.appendChild(ok);
-  }
+  if (showDot) { const ok = document.createElement('button'); ok.className = 'kb-btn kb-ok'; ok.style.gridColumn = 'span 3'; ok.textContent = 'OK'; ok.onclick = () => handleKey('OK'); grid.appendChild(ok); }
 }
 
 function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden')); const target = document.getElementById(id); if (target) { target.classList.remove('hidden'); target.scrollTop = 0; } }
