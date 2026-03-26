@@ -3,274 +3,220 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>MatekSprint Pro - Refactored</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>MatekSprint Pro - Full Restoration</title>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Nunito:wght@500;700;800;900&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { 
-        --bg: #0f0f1a; --surface: #1a1a2e; --surface2: #252540; --text: #f0f0ff; 
-        --text-dim: #8888aa; --c1: #4cc9f0; --c2: #ff9e00; --c3: #06d6a0; --c4: #ff6b9d; 
-        --danger: #ff4d6d; --ok: #06d6a0; --font-ui: 'Nunito', sans-serif; 
-        --font-num: 'Space Mono', monospace; 
-        --safe-top: env(safe-area-inset-top, 20px); 
-        --safe-bot: env(safe-area-inset-bottom, 20px); 
-        --accent: #4cc9f0; 
+      --bg: #0f0f1a; --surface: #1a1a2e; --surface2: #252540; --text: #f0f0ff; 
+      --text-dim: #8888aa; --c1: #4cc9f0; --c2: #ff9e00; --c3: #06d6a0; --c4: #ff6b9d; 
+      --danger: #ff4d6d; --ok: #06d6a0; --font-ui: 'Nunito', sans-serif; 
+      --font-num: 'Space Mono', monospace; 
+      --safe-top: env(safe-area-inset-top, 20px); 
+      --safe-bot: env(safe-area-inset-bottom, 20px); 
+      --accent: #4cc9f0; 
     }
     
-    html, body { 
-        height: 100dvh; /* Dynamic Viewport Height iOS-hez */
-        width: 100vw; 
-        overflow: hidden; 
-        touch-action: manipulation; 
-        background: var(--bg); 
-        color: var(--text); 
-        font-family: var(--font-ui);
-    }
-
-    .screen { 
-        position: absolute; 
-        inset: 0; 
-        display: flex; 
-        flex-direction: column; 
-        padding: var(--safe-top) 16px var(--safe-bot); 
-        transition: opacity .18s ease; 
-    }
-
-    /* Görgethető tartalom a fix billentyűzet felett */
-    .scroll-content {
-        flex: 1;
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 12px;
-        width: 100%;
-        padding-bottom: 10px;
-    }
-
+    html, body { height: 100dvh; width: 100vw; overflow: hidden; position: fixed; background: var(--bg); color: var(--text); font-family: var(--font-ui); touch-action: manipulation; }
+    .stars-bg { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+    .screen { position: absolute; inset: 0; display: flex; flex-direction: column; padding: var(--safe-top) 16px var(--safe-bot); transition: opacity .18s ease; }
+    .scroll-content { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; width: 100%; -webkit-overflow-scrolling: touch; }
     .hidden { opacity: 0; pointer-events: none; }
 
-    /* Rács stílusa */
-    #visual-container { 
-        display: none; 
-        flex-direction: column; 
-        align-items: center; 
-        gap: 8px; 
-    }
-    .grid-label { font-size: 14px; color: var(--text-dim); font-weight: 700; }
-    #visual-canvas { 
-        width: min(220px, 50vw); 
-        height: min(220px, 50vw); 
-        background: var(--surface2); 
-        border-radius: 8px; 
-        border: 2px solid var(--surface2);
-    }
+    /* UI Elemet */
+    .task-eq { font-family: var(--font-num); font-size: clamp(22px, 6vw, 38px); text-align: center; margin: 15px 0; min-height: 80px; display: flex; align-items: center; }
+    .task-eq.word-problem { font-family: var(--font-ui); font-size: 19px; line-height: 1.4; font-weight: 500; }
+    .task-eq.target-problem { color: var(--c3); font-weight: 800; }
 
-    /* Billentyűzet - Fixált alulra */
-    .keyboard { 
-        width: 100%; 
-        max-width: 400px; 
-        margin: 0 auto;
-        padding-top: 10px;
-        flex-shrink: 0;
-    }
-    .kb-grid { 
-        display: grid; 
-        grid-template-columns: repeat(3, 1fr); 
-        gap: 8px; 
-    }
-    .kb-btn { 
-        font-family: var(--font-num); 
-        font-size: 24px; 
-        font-weight: 700; 
-        background: var(--surface); 
-        border: 1px solid var(--surface2); 
-        border-radius: 12px; 
-        color: var(--text); 
-        height: 54px; 
-        display: flex; 
-        align-items: center; 
-        justify-content: center; 
-        -webkit-user-select: none;
-    }
-    .kb-btn:active { background: var(--surface2); transform: scale(0.95); }
-    .kb-ok { 
-        background: var(--accent); 
-        color: #fff; 
-        grid-column: span 3; /* Teljes szélesség, hogy ne maradhasson le */
-        font-weight: 900;
-        margin-top: 4px;
-    }
-
-    .task-eq { font-family: var(--font-num); font-size: 32px; text-align: center; margin: 10px 0; }
-    .answer-box { font-family: var(--font-num); font-size: 38px; color: var(--accent); min-height: 70px; width: 100%; max-width: 300px; background: var(--surface); border-radius: 15px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--surface2); }
+    #visual-container { display: none; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 10px; }
+    #visual-canvas { width: 220px; height: 220px; background: var(--surface2); border-radius: 12px; border: 3px solid var(--surface2); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
     
-    /* Star background fix */
-    .stars-bg { position: fixed; inset: 0; z-index: -1; }
+    .answer-box { font-family: var(--font-num); font-size: 36px; color: var(--accent); min-height: 75px; width: 100%; max-width: 300px; background: var(--surface); border-radius: 18px; display: flex; align-items: center; justify-content: center; border: 3px solid var(--surface2); }
+    .cursor { width: 3px; height: 30px; background: var(--accent); margin-left: 8px; animation: blink 0.8s infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* Billentyűzet - Standalone iOS Optimalizált */
+    .keyboard { width: 100%; max-width: 400px; margin: 0 auto; flex-shrink: 0; padding-top: 10px; }
+    .kb-grid { display: grid; gap: 8px; }
+    .kb-btn { font-family: var(--font-num); font-size: 24px; font-weight: 700; background: var(--surface); border: 1px solid var(--surface2); border-radius: 14px; color: var(--text); height: clamp(48px, 7dvh, 60px); display: flex; align-items: center; justify-content: center; }
+    .kb-btn:active { background: var(--surface2); transform: scale(0.96); }
+    .kb-ok { background: var(--accent); color: #fff; grid-column: span 3; font-weight: 900; height: 65px !important; margin-top: 4px; box-shadow: 0 4px 0 color-mix(in srgb, var(--accent) 70%, black); }
+    .kb-ok:active { transform: translateY(2px); box-shadow: none; }
+
+    #tip-pop { position: fixed; top: 20%; left: 50%; transform: translateX(-50%); background: var(--surface2); border: 2px solid var(--accent); padding: 15px; border-radius: 15px; z-index: 100; display: none; text-align: center; width: 80%; }
   </style>
 </head>
-<body>
+<body ontouchstart="">
 <canvas class="stars-bg" id="stars-canvas"></canvas>
+<div id="tip-pop"><b>TIPP:</b> <span id="tip-text"></span></div>
 
 <div class="screen" id="home">
-    <div class="scroll-content">
-        <div style="padding: 40px 0; text-align: center;">
-            <h1 style="font-family: var(--font-num); font-size: 38px;">MatekSprint</h1>
-            <p style="color: var(--text-dim);">VÁLASSZ KATEGÓRIÁT</p>
-        </div>
-        <div id="cat-list" style="width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 12px;"></div>
-    </div>
+  <div class="scroll-content">
+    <h1 style="margin: 40px 0 10px; font-family: var(--font-num); font-size: 40px;">MatekSprint</h1>
+    <p style="color: var(--text-dim); margin-bottom: 30px;">Válassz kategóriát!</p>
+    <div id="cat-list" style="width: 100%; max-width: 350px; display: flex; flex-direction: column; gap: 12px;"></div>
+  </div>
 </div>
 
 <div class="screen hidden" id="game">
-    <div class="scroll-content">
-        <div style="display: flex; justify-content: space-between; width: 100%; font-family: var(--font-num); font-size: 24px;">
-            <span id="score-num">0</span>
-            <span id="timer-num">60</span>
-        </div>
-        <div id="task-eq" class="task-eq"></div>
-        <div id="visual-container">
-            <span class="grid-label">10 × 10-ES RÁCS</span>
-            <canvas id="visual-canvas" width="200" height="200"></canvas>
-        </div>
-        <div class="answer-box"><span id="answer-text"></span><span style="width:2px; height:30px; background:var(--accent); margin-left:5px;"></span></div>
+  <div class="scroll-content">
+    <div style="display: flex; justify-content: space-between; width: 100%; font-family: var(--font-num); font-size: 24px; padding: 5px 10px;">
+      <span id="score-num">0</span> <span id="timer-num">60</span>
     </div>
-    <div class="keyboard">
-        <div class="kb-grid" id="kb-grid"></div>
-        <button class="kb-btn kb-ok" onclick="submit()">BEKÜLDÉS</button>
+    <div id="task-eq" class="task-eq"></div>
+    <div id="visual-container">
+      <span style="font-size: 12px; font-weight: 800; color: var(--accent);">10 × 10-ES RÁCS</span>
+      <canvas id="visual-canvas" width="200" height="200"></canvas>
     </div>
+    <div class="answer-box"><span id="answer-text"></span><span class="cursor"></span></div>
+  </div>
+  <div class="keyboard"><div class="kb-grid" id="kb-grid"></div><button class="kb-btn kb-ok" onclick="submit()">BEKÜLDÉS</button></div>
 </div>
 
 <div class="screen hidden" id="result">
-    <div class="scroll-content">
-        <h2 style="font-size: 60px; color: var(--accent);" id="result-num">0</h2>
-        <div id="res-stats" style="text-align: center; margin-bottom: 20px;"></div>
-        <button class="kb-btn kb-ok" style="max-width: 300px;" onclick="renderHome()">VISSZA A MENÜBE</button>
-        <div id="history-list" style="width: 100%; margin-top: 20px;"></div>
-    </div>
+  <div class="scroll-content">
+    <h2 style="font-size: 60px; color: var(--accent); margin-top: 40px;" id="result-num">0</h2>
+    <p id="res-stats" style="margin-bottom: 20px; font-weight: 700;"></p>
+    <button class="kb-btn kb-ok" style="max-width: 300px;" onclick="location.reload()">ÚJ JÁTÉK</button>
+    <div id="history-list" style="width: 100%; margin-top: 20px;"></div>
+  </div>
 </div>
 
 <script>
-// --- KONSTANSOK ÉS ÁLLAPOT ---
+// --- KONSTANSOK ÉS ÖSSZES EREDETI TEMPLATE ---
 const CATS = {
-    tszorz: { name: 'Tizedes szorzás', color: '#06d6a0', gen: (l) => ({ q: `${(rand(2, 9)/10).toFixed(1)} × ${rand(2, 9)}`, a: null }) },
-    grid: { name: 'Rács-arány', color: '#ff6b9d', gen: () => { const f = rand(10, 90); return { q: 'Hányad része színes?', a: (f/100).toString(), isVisual: true, val: f }; } }
+  szorzas: { id: 'szorzas', name:'Szorzótábla', color:'#4cc9f0', gen: (l) => { const a=rand(2, 5+l*2), b=rand(2, 9); return {q:`${a} × ${b}`, a:(a*b).toString(), k:`s${a}x${b}`} } },
+  tszorz: { id: 'tszorz', name:'Tizedes szorzás', color:'#06d6a0', gen: (l) => { const a=rand(2, 9)/10; const b=rand(2, 9); return {q:`${f(a)} × ${b}`, a:f(a*b), k:`ts${a}x${b}`} } },
+  tort: { id: 'tort', name:'Törtek', color:'#ffd166', gen: (l) => { const d=[2,4,5,8,10,20,25][Math.min(6, l)]; const n=rand(1,d-1); return {q:`${n} / ${d}`, a:f(n/d), k:`tr${n}/${d}`} } }
 };
 
-let State = { cat: 'grid', score: 0, time: 60, input: '', task: null, history: [] };
-const rand = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
+const WORD_TEMPLATES = [
+  { gen: () => ({ q: `Egy sütihez 0,3 kg liszt kell. Mennyi kell 3 sütihez?`, a: "0,9", hint: "Szorzás: 0,3 × 3" }) },
+  { gen: () => ({ q: `Reggel 18,5 °C volt, délutánra nőtt 1,2 °C-ot. Hány fok van?`, a: "19,7", hint: "Összeadás: 18,5 + 1,2" }) },
+  { gen: () => ({ q: `Egy 4,8 méteres kötelet kettévágtunk. Hány méter egy darab?`, a: "2,4", hint: "Osztás: 4,8 ÷ 2" }) }
+];
 
-// --- LOGIKA ---
+let State = { cat: null, score: 0, time: 60, input: '', task: null, history: [], level: 1, totalSolved: 0 };
+const rand = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
+const f = (n) => parseFloat(Number(n).toPrecision(12)).toString().replace('.', ',');
+
+// --- JÁTÉK LOGIKA ---
 function startGame(id) {
-    State = { cat: id, score: 0, time: 60, input: '', history: [] };
-    showScreen('game');
-    nextTask();
-    startTimer();
+  State = { cat: id, score: 0, time: 60, input: '', history: [], level: 1, totalSolved: 0 };
+  document.documentElement.style.setProperty('--accent', CATS[id].color);
+  showScreen('game');
+  nextTask();
+  const timer = setInterval(() => {
+    State.time--;
+    document.getElementById('timer-num').textContent = State.time;
+    if (State.time <= 0) { clearInterval(timer); showScreen('result'); renderResult(); }
+  }, 1000);
 }
 
 function nextTask() {
-    State.input = '';
-    document.getElementById('answer-text').textContent = '';
-    
-    // 5. osztályos logika: néha dobjunk be rácsot a tizedeseknél
-    if (Math.random() > 0.7 || State.cat === 'grid') {
-        State.task = CATS.grid.gen();
-    } else {
-        State.task = CATS.tszorz.gen();
-        const parts = State.task.q.split(' × ');
-        State.task.a = (parseFloat(parts[0]) * parseFloat(parts[1])).toFixed(2).replace(/\.00$/, '').replace(/\.0$/, '');
-    }
+  State.input = ''; document.getElementById('answer-text').textContent = '';
+  State.totalSolved++;
+  if (State.score > 0 && State.score % 5 === 0) State.level++;
 
-    document.getElementById('task-eq').textContent = State.task.isVisual ? State.task.q : `${State.task.q} = ?`;
-    document.getElementById('visual-container').style.display = State.task.isVisual ? 'flex' : 'none';
-    if (State.task.isVisual) drawGrid(State.task.val);
-    
-    renderKeyboard();
+  const roll = Math.random();
+  if (State.totalSolved < 3) { // Első két feladat vizuális rács segítésnek
+    const v = rand(10, 90); State.task = { q: "A terület hányad része színes?", a: f(v/100), isVisual: true, val: v };
+  } else if (State.level >= 4 && State.totalSolved % 6 === 0) { // CÉLSZÁM MÓD
+    const n1 = rand(2,5), n2 = rand(2,5); const target = n1 * 0.5 + n2;
+    State.task = { q: `Célszám: ${f(target)}`, nums: [n1, n2, "0,5"], a: f(target), isTarget: true };
+  } else if (State.totalSolved % 7 === 0) { // SZÖVEGES
+    State.task = WORD_TEMPLATES[rand(0, WORD_TEMPLATES.length-1)].gen(); State.task.isWord = true;
+  } else {
+    State.task = CATS[State.cat].gen(State.level);
+  }
+
+  const eqEl = document.getElementById('task-eq');
+  eqEl.textContent = State.task.q + (State.task.isVisual || State.task.isTarget || State.task.isWord ? "" : " = ?");
+  eqEl.className = 'task-eq' + (State.task.isWord ? ' word-problem' : '') + (State.task.isTarget ? ' target-problem' : '');
+  
+  document.getElementById('visual-container').style.display = State.task.isVisual ? 'flex' : 'none';
+  if (State.task.isVisual) drawGrid(State.task.val);
+  renderKeyboard();
 }
 
 function drawGrid(filled) {
-    const canvas = document.getElementById('visual-canvas');
-    const ctx = canvas.getContext('2d');
-    const s = 20; // 200/10
-    ctx.clearRect(0,0,200,200);
-    
-    for(let i=0; i<100; i++) {
-        const x = (i % 10) * s;
-        const y = Math.floor(i / 10) * s;
-        
-        // Alapszín
-        ctx.fillStyle = i < filled ? '#4cc9f0' : '#252540';
-        ctx.fillRect(x + 1, y + 1, s - 2, s - 2);
-        
-        // 5x5-ös vastagabb segédvonalak (pedagógiai segítség 12 éveseknek)
-        ctx.strokeStyle = '#0f0f1a';
-        ctx.lineWidth = 0.5;
-        if ((i+1) % 5 === 0) ctx.lineWidth = 2;
-        ctx.strokeRect(x, y, s, s);
-    }
+  const c = document.getElementById('visual-canvas'), ctx = c.getContext('2d');
+  const s = 20; ctx.clearRect(0,0,200,200);
+  for(let i=0; i<100; i++) {
+    const x=(i%10)*s, y=Math.floor(i/10)*s;
+    ctx.fillStyle = i < filled ? 'var(--accent)' : 'var(--surface2)';
+    ctx.fillRect(x+1, y+1, s-2, s-2);
+    ctx.strokeStyle = '#0f0f1a'; ctx.lineWidth = ((i+1)%5===0) ? 2 : 0.5;
+    ctx.strokeRect(x,y,s,s);
+  }
 }
 
 function renderKeyboard() {
-    const container = document.getElementById('kb-grid');
-    container.innerHTML = '';
-    const keys = [1,2,3,4,5,6,7,8,9,',',0,'⌫'];
-    keys.forEach(k => {
-        const btn = document.createElement('div');
-        btn.className = 'kb-btn';
-        btn.textContent = k;
-        btn.onclick = () => {
-            if (k === '⌫') State.input = State.input.slice(0, -1);
-            else if (State.input.length < 8) State.input += k;
-            document.getElementById('answer-text').textContent = State.input;
-        };
-        container.appendChild(btn);
-    });
+  const grid = document.getElementById('kb-grid'); grid.innerHTML = '';
+  let keys = [1,2,3,4,5,6,7,8,9,',',0,'⌫'];
+  if (State.task.isTarget) {
+    grid.style.gridTemplateColumns = 'repeat(4, 1fr)';
+    keys = [...State.task.nums, '+', '-', '×', '÷', '(', ')', '⌫'];
+  } else {
+    grid.style.gridTemplateColumns = 'repeat(3, 1fr)';
+  }
+  keys.forEach(k => {
+    const b = document.createElement('div'); b.className = 'kb-btn'; b.textContent = k;
+    b.onclick = () => {
+      if (k==='⌫') State.input = State.input.slice(0,-1);
+      else if (State.input.length < 15) State.input += k;
+      document.getElementById('answer-text').textContent = State.input;
+    };
+    grid.appendChild(b);
+  });
 }
 
 function submit() {
-    if (!State.input) return;
-    const userAns = State.input.replace(',', '.');
-    const isCorrect = Math.abs(parseFloat(userAns) - parseFloat(State.task.a)) < 0.0001;
-    
-    if (isCorrect) State.score++;
-    State.history.push({ q: State.task.q, a: State.task.a, ua: State.input, ok: isCorrect });
-    
-    document.getElementById('score-num').textContent = State.score;
-    nextTask();
+  if (!State.input) return;
+  const clean = (s) => s.replace(/,/g,'.').replace(/×/g,'*').replace(/÷/g,'/');
+  let userVal;
+  try { userVal = State.task.isTarget ? eval(clean(State.input)) : parseFloat(clean(State.input)); } catch(e) { return; }
+  
+  const correctVal = parseFloat(clean(State.task.a));
+  const isCorrect = Math.abs(userVal - correctVal) < 0.0001;
+
+  if (isCorrect) State.score++;
+  else if (Math.abs(userVal - correctVal*10) < 0.1 || Math.abs(userVal - correctVal/10) < 0.1) showTip("Figyelj a tizedeshelyekre!");
+
+  State.history.push({ q: State.task.q, a: State.task.a, ua: State.input, ok: isCorrect });
+  document.getElementById('score-num').textContent = State.score;
+  nextTask();
 }
 
-// --- UTILS ---
-function startTimer() {
-    const timer = setInterval(() => {
-        State.time--;
-        document.getElementById('timer-num').textContent = State.time;
-        if (State.time <= 0) { clearInterval(timer); showScreen('result'); renderResult(); }
-    }, 1000);
+function showTip(m) { 
+  const p = document.getElementById('tip-pop'); document.getElementById('tip-text').textContent = m;
+  p.style.display='block'; setTimeout(()=>p.style.display='none', 2500);
 }
 
 function renderResult() {
-    document.getElementById('result-num').textContent = State.score;
+  document.getElementById('result-num').textContent = State.score;
+  const acc = State.history.length ? Math.round((State.history.filter(h=>h.ok).length/State.history.length)*100) : 0;
+  document.getElementById('res-stats').textContent = `Pontosság: ${acc}% | Szint: ${State.level}`;
+  document.getElementById('history-list').innerHTML = State.history.map(h => `
+    <div style="padding:12px; margin-bottom:8px; border-radius:12px; background:var(--surface); border-left:5px solid ${h.ok?'var(--ok)':'var(--danger)'}">
+      ${h.q} = <b>${h.ua}</b> ${h.ok?'':'<span style="opacity:0.5">('+h.a+')</span>'}
+    </div>
+  `).reverse().join('');
 }
 
 function renderHome() {
-    const list = document.getElementById('cat-list');
-    list.innerHTML = '';
-    Object.keys(CATS).forEach(k => {
-        const b = document.createElement('div');
-        b.className = 'kb-btn';
-        b.style.borderColor = CATS[k].color;
-        b.textContent = CATS[k].name;
-        b.onclick = () => startGame(k);
-        list.appendChild(b);
-    });
-    showScreen('home');
+  const list = document.getElementById('cat-list');
+  Object.values(CATS).forEach(c => {
+    const b = document.createElement('div'); b.className = 'cat-btn';
+    b.style.cssText = `background:var(--surface); border:2px solid ${c.color}; padding:20px; border-radius:15px; text-align:center; font-weight:800;`;
+    b.textContent = c.name; b.onclick = () => startGame(c.id);
+    list.appendChild(b);
+  });
 }
 
-function showScreen(id) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-    document.getElementById(id).classList.remove('hidden');
-}
-
+function showScreen(id) { document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
 renderHome();
 </script>
 </body>
