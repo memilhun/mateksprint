@@ -56,37 +56,37 @@
     }
     .screen.hidden { opacity: 0; pointer-events: none; transform: scale(.96); }
 
-    /* --- HOME --- */
+    /* --- HOME - NÖVELT MÉRETEK --- */
     #home { justify-content: flex-start; overflow-y: auto; }
-    .home-header { width: 100%; text-align: center; padding: 18px 0 22px; flex-shrink: 0; }
+    .home-header { width: 100%; text-align: center; padding: 24px 0 32px; flex-shrink: 0; }
     .logo {
       font-family: var(--font-num);
-      font-size: clamp(28px, 8vw, 38px); font-weight: 700; letter-spacing: -1px;
+      font-size: clamp(34px, 10vw, 44px); font-weight: 700; letter-spacing: -1px;
       background: linear-gradient(135deg, #4cc9f0, #ff6b9d);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
     }
-    .logo-sub { font-size: 13px; color: var(--text-dim); margin-top: 3px; letter-spacing: 1px; text-transform: uppercase; }
+    .logo-sub { font-size: 15px; color: var(--text-dim); margin-top: 6px; letter-spacing: 1px; text-transform: uppercase; font-weight: 700; }
 
-    .categories { width: 100%; display: flex; flex-direction: column; gap: 20px; padding-bottom: 40px; }
+    .categories { width: 100%; display: flex; flex-direction: column; gap: 16px; padding-bottom: 60px; max-width: 500px; }
     
     .cat-btn {
       --c: var(--c1);
       background: var(--surface);
       border: 2px solid color-mix(in srgb, var(--c) 40%, transparent);
-      border-radius: 20px; padding: 18px 14px 16px; cursor: pointer;
-      display: flex; flex-direction: column; align-items: center; gap: 6px;
-      transition: transform .12s; -webkit-user-select: none; user-select: none;
+      border-radius: 24px; padding: 22px 16px; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      transition: transform .12s, background .2s; -webkit-user-select: none; user-select: none;
       position: relative; overflow: hidden;
     }
     .cat-btn::before {
       content: ''; position: absolute; inset: 0;
-      background: radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--c) 18%, transparent), transparent 70%);
+      background: radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--c) 18%, transparent), transparent 75%);
     }
-    .cat-btn:active { transform: scale(.95); }
+    .cat-btn:active { transform: scale(.96); background: var(--surface2); }
     
-    .cat-name { font-size: 11px; font-weight: 800; text-align: center; color: var(--text); line-height: 1.3; text-transform: uppercase; }
-    .cat-hs   { font-family: var(--font-num); font-size: 10px; color: var(--text-dim); margin-top: 2px; }
-    .cat-hs b { color: var(--c); }
+    .cat-name { font-size: 18px; font-weight: 900; text-align: center; color: var(--text); line-height: 1.2; text-transform: uppercase; letter-spacing: 0.5px; }
+    .cat-hs   { font-family: var(--font-num); font-size: 13px; color: var(--text-dim); margin-top: 4px; }
+    .cat-hs b { color: var(--c); font-weight: 700; }
 
     /* --- GAME --- */
     #game { justify-content: space-between; gap: 8px; }
@@ -98,24 +98,24 @@
     
     @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-2px); } 75% { transform: translateX(2px); } }
 
-    .progress-bar  { width: 100%; height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+    .progress-bar  { width: 100%; height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
     .progress-fill { height: 100%; width: 100%; background: var(--accent); transition: width 1.05s linear; }
 
     .task-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; width: 100%; position: relative; }
-    .task-eq   { font-family: var(--font-num); font-size: clamp(32px, 10vw, 52px); font-weight: 700; color: var(--text); text-align: center; }
+    .task-eq   { font-family: var(--font-num); font-size: clamp(36px, 12vw, 56px); font-weight: 700; color: var(--text); text-align: center; }
 
     #level-up-pop {
-      position: absolute; top: 20%; font-weight: 900; font-size: 24px; color: #ffd60a;
+      position: absolute; top: 20%; font-weight: 900; font-size: 28px; color: #ffd60a;
       text-shadow: 0 0 15px rgba(255,214,10,0.5); pointer-events: none; opacity: 0;
       transform: translateY(20px); transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     #level-up-pop.show { opacity: 1; transform: translateY(0); }
 
     .answer-box {
-      font-family: var(--font-num); font-size: 42px; font-weight: 700; color: var(--accent);
-      min-width: 160px; min-height: 70px; background: var(--surface);
+      font-family: var(--font-num); font-size: 46px; font-weight: 700; color: var(--accent);
+      min-width: 180px; min-height: 80px; background: var(--surface);
       border: 3px solid color-mix(in srgb, var(--accent) 30%, transparent);
-      border-radius: 18px; display: flex; align-items: center; justify-content: center;
+      border-radius: 20px; display: flex; align-items: center; justify-content: center;
     }
     .answer-box.has-input { border-color: var(--accent); }
     .cursor { display: inline-block; width: 3px; height: 1em; background: var(--accent); margin-left: 4px; animation: blink .8s step-end infinite; }
@@ -125,10 +125,10 @@
     .keyboard { width: 100%; max-width: 360px; padding-bottom: 8px; }
     .kb-grid  { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
     .kb-btn {
-      font-family: var(--font-num); font-size: 24px; font-weight: 700;
+      font-family: var(--font-num); font-size: 26px; font-weight: 700;
       background: var(--surface); border: 2px solid var(--surface2);
       border-radius: 16px; color: var(--text); cursor: pointer;
-      aspect-ratio: 1.5; display: flex; align-items: center; justify-content: center;
+      aspect-ratio: 1.4; display: flex; align-items: center; justify-content: center;
       transition: background .1s, transform .1s; -webkit-user-select: none;
     }
     .kb-btn:active { background: var(--surface2); transform: scale(0.92); }
@@ -137,16 +137,16 @@
     /* --- RESULT --- */
     #result { justify-content: flex-start; overflow-y: auto; }
     .result-num   { font-family: var(--font-num); font-size: 80px; font-weight: 700; color: var(--accent); line-height: 1; }
-    .result-hs-wrap { background: var(--surface); border-radius: 20px; padding: 16px; width: 100%; max-width: 300px; margin-top: 10px; }
-    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; border-top: 1px solid var(--surface2); padding-top: 10px; }
-    .stat-box { font-size: 12px; color: var(--text-dim); }
-    .stat-box b { display: block; color: var(--text); font-size: 16px; font-family: var(--font-num); }
+    .result-hs-wrap { background: var(--surface); border-radius: 24px; padding: 20px; width: 100%; max-width: 320px; margin-top: 10px; }
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; border-top: 1px solid var(--surface2); padding-top: 12px; }
+    .stat-box { font-size: 14px; color: var(--text-dim); }
+    .stat-box b { display: block; color: var(--text); font-size: 18px; font-family: var(--font-num); }
 
-    .history-list { display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 15px; }
-    .history-item { display: flex; align-items: center; background: var(--surface); padding: 12px; border-radius: 12px; border-left: 4px solid var(--danger); gap: 10px; }
+    .history-list { display: flex; flex-direction: column; gap: 10px; width: 100%; margin-top: 20px; }
+    .history-item { display: flex; align-items: center; background: var(--surface); padding: 14px; border-radius: 14px; border-left: 5px solid var(--danger); gap: 12px; font-size: 15px; }
     .history-item.correct { border-left-color: var(--ok); }
     
-    .btn-primary { width: 100%; max-width: 300px; padding: 18px; border-radius: 18px; background: var(--accent); color: #fff; font-weight: 800; border: none; font-size: 18px; cursor: pointer; }
+    .btn-primary { width: 100%; max-width: 320px; padding: 20px; border-radius: 20px; background: var(--accent); color: #fff; font-weight: 800; border: none; font-size: 20px; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -168,7 +168,7 @@
   <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
   <div class="task-area">
     <div id="level-up-pop">LEVEL UP! 🚀</div>
-    <div class="cat-badge" id="cat-badge" style="font-size: 12px; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px;"></div>
+    <div class="cat-badge" id="cat-badge" style="font-size: 14px; opacity: 0.8; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 800; color: var(--accent);"></div>
     <div class="task-eq" id="task-eq"></div>
     <div class="answer-box" id="answer-box">
       <span id="answer-text"></span><span class="cursor"></span>
@@ -178,30 +178,30 @@
 </div>
 
 <div class="screen hidden" id="result">
-  <div class="result-top" style="text-align: center; width: 100%;">
+  <div class="result-top" style="text-align: center; width: 100%; display: flex; flex-direction: column; align-items: center;">
     <div class="result-num" id="result-num">0</div>
-    <div class="stars" id="result-stars" style="font-size: 24px; margin: 5px 0;">⭐⭐⭐</div>
-    <div class="result-hs-wrap" style="margin: 10px auto;">
-      <div id="new-record" style="color:#ffd60a; font-weight:800; display:none; margin-bottom: 5px;">🏆 ÚJ REKORD!</div>
+    <div class="stars" id="result-stars" style="font-size: 28px; margin: 8px 0;">⭐⭐⭐</div>
+    <div class="result-hs-wrap">
+      <div id="new-record" style="color:#ffd60a; font-weight:900; display:none; margin-bottom: 8px; font-size: 18px;">🏆 ÚJ REKORD!</div>
       <div class="stats-grid">
         <div class="stat-box">Pontosság<b id="res-acc">0%</b></div>
         <div class="stat-box">Átlagidő<b id="res-time">0ms</b></div>
       </div>
-      <div style="margin-top:10px; font-size:12px;">Elért szint: <b id="res-level" style="color:var(--accent)">1</b></div>
+      <div style="margin-top:12px; font-size:14px;">Elért szint: <b id="res-level" style="color:var(--accent)">1</b></div>
     </div>
-    <div class="result-btns" style="margin-top:20px; width:100%; display:flex; flex-direction:column; align-items:center; gap:10px;">
+    <div class="result-btns" style="margin-top:24px; width:100%; display:flex; flex-direction:column; align-items:center; gap:12px;">
       <button class="btn-primary" id="btn-retry">Újra!</button>
-      <button style="background:none; border:none; color:var(--text-dim); cursor:pointer; padding: 10px;" id="btn-home">Vissza a menübe</button>
+      <button style="background:none; border:none; color:var(--text-dim); cursor:pointer; padding: 12px; font-size: 16px; font-weight: 700;" id="btn-home">Vissza a menübe</button>
     </div>
   </div>
-  <div class="history-wrap" style="width: 100%; max-width: 400px; padding-bottom: 40px;">
+  <div class="history-wrap" style="width: 100%; max-width: 400px; padding-bottom: 50px;">
     <div class="history-list" id="history-list"></div>
   </div>
 </div>
 
 <script>
 /**
- * MatekSprint Pro - Refactored Engine
+ * MatekSprint Pro - Engine
  */
 
 const CATS = {
@@ -217,34 +217,20 @@ const CATS = {
     gen: (l) => { const d=[2,4,5,8,10,20,25][Math.min(6, l)]; const n=rand(1,d-1); return {q:`${n} / ${d}`, a:fmt(n/d), k:`${n}/${d}`} } }
 };
 
-// Application State
 let State = {
-  cat: null,
-  score: 0,
-  time: 60,
-  timerInterval: null,
-  task: null,
-  input: '',
-  history: [],
-  mistakes: [],
-  level: 1,
-  streak: 0,
-  startTime: 0,
-  isInputLocked: false
+  cat: null, score: 0, time: 60, timerInterval: null, task: null,
+  input: '', history: [], mistakes: [], level: 1, streak: 0,
+  startTime: 0, isInputLocked: false
 };
 
-// --- HELPERS ---
-function rand(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
-function fmt(n) { return parseFloat(Number(n).toFixed(8)).toString(); }
+const rand = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
+const fmt = (n) => parseFloat(Number(n).toFixed(8)).toString();
+
 function getStats(id) { 
-  try {
-    return JSON.parse(localStorage.getItem('stats_' + id)) || { hs: 0, avgT: 0, acc: 0, plays: 0 };
-  } catch (e) {
-    return { hs: 0, avgT: 0, acc: 0, plays: 0 };
-  }
+  try { return JSON.parse(localStorage.getItem('stats_' + id)) || { hs: 0, avgT: 0, acc: 0, plays: 0 }; } 
+  catch (e) { return { hs: 0, avgT: 0, acc: 0, plays: 0 }; }
 }
 
-// --- CORE FUNCTIONS ---
 function renderHome() {
   const container = document.getElementById('cat-list');
   container.innerHTML = '';
@@ -255,7 +241,7 @@ function renderHome() {
     btn.style.setProperty('--c', cat.color);
     btn.innerHTML = `
       <div class="cat-name">${cat.name}</div>
-      <div class="cat-hs">Rekord: <b>${stats.hs}</b> | Átl. idő: <b>${stats.avgT}ms</b></div>
+      <div class="cat-hs">Rekord: <b>${stats.hs}</b> | Átl: <b>${stats.avgT}ms</b></div>
     `;
     btn.onclick = () => startGame(cat.id);
     container.appendChild(btn);
@@ -264,23 +250,11 @@ function renderHome() {
 }
 
 function startGame(id) {
-  // Clear any existing timer to prevent leaks
   if (State.timerInterval) clearInterval(State.timerInterval);
-
-  // Initialize State
   State = {
-    cat: id,
-    score: 0,
-    time: 60,
-    timerInterval: null,
-    task: null,
-    input: '',
-    history: [],
-    mistakes: [],
-    level: 1,
-    streak: 0,
-    startTime: 0,
-    isInputLocked: false
+    cat: id, score: 0, time: 60, timerInterval: null, task: null,
+    input: '', history: [], mistakes: [], level: 1, streak: 0,
+    startTime: 0, isInputLocked: false
   };
 
   const catCfg = CATS[id];
@@ -300,7 +274,6 @@ function startGame(id) {
     const timerEl = document.getElementById('timer-num');
     timerEl.textContent = State.time;
     document.getElementById('progress-fill').style.width = (State.time / 60 * 100) + '%';
-    
     if (State.time <= 10) timerEl.classList.add('danger');
     if (State.time <= 0) endGame();
   }, 1000);
@@ -311,34 +284,22 @@ function nextTask() {
   State.isInputLocked = false;
   document.getElementById('answer-text').textContent = '';
   document.getElementById('answer-box').classList.remove('has-input');
-
-  // Spaced Repetition (30% probability)
   if (State.mistakes.length > 0 && Math.random() < 0.3) {
     State.task = State.mistakes[rand(0, State.mistakes.length - 1)];
   } else {
     const t = CATS[State.cat].gen(State.level);
     State.task = { q: t.q, a: t.a, k: t.k };
   }
-  
   document.getElementById('task-eq').textContent = `${State.task.q} = ?`;
   State.startTime = performance.now();
 }
 
 function submit() {
   if (!State.input || State.isInputLocked) return;
-  
   State.isInputLocked = true;
   const rt = performance.now() - State.startTime;
-  const normalizedInput = State.input.replace(',', '.');
-  const isCorrect = fmt(parseFloat(normalizedInput)) === State.task.a;
-
-  State.history.push({ 
-    q: State.task.q, 
-    ua: State.input, 
-    ca: State.task.a, 
-    ok: isCorrect, 
-    rt 
-  });
+  const isCorrect = fmt(parseFloat(State.input.replace(',', '.'))) === State.task.a;
+  State.history.push({ q: State.task.q, ua: State.input, ca: State.task.a, ok: isCorrect, rt });
 
   if (isCorrect) {
     State.streak++;
@@ -346,27 +307,16 @@ function submit() {
     if (rt < CATS[State.cat].bonusTime) points++;
     if (State.level > 3) points++;
     State.score += points;
-    
-    if (State.streak >= 5 && State.level < 5) {
-      State.level++; 
-      State.streak = 0;
-      showLevelUp();
-    }
-    
+    if (State.streak >= 5 && State.level < 5) { State.level++; State.streak = 0; showLevelUp(); }
     const el = document.getElementById('score-num');
     el.textContent = State.score;
     el.classList.add('bump'); 
     setTimeout(() => el.classList.remove('bump'), 200);
   } else {
     State.streak = 0;
-    // Avoid duplicates in mistakes
-    if (!State.mistakes.find(m => m.k === State.task.k)) {
-      State.mistakes.push(State.task);
-    }
+    if (!State.mistakes.find(m => m.k === State.task.k)) State.mistakes.push(State.task);
     if (State.level > 1) State.level--;
   }
-
-  // Brief pause for visual feedback could be here, but per requirements we maintain logic
   nextTask();
 }
 
@@ -379,16 +329,13 @@ function showLevelUp() {
 
 function endGame() {
   if (State.timerInterval) clearInterval(State.timerInterval);
-  
   const stats = getStats(State.cat);
   const total = State.history.length;
   const correct = State.history.filter(h => h.ok).length;
   const acc = total ? Math.round((correct / total) * 100) : 0;
   const avg = total ? Math.round(State.history.reduce((s, h) => s + h.rt, 0) / total) : 0;
-
   const isNewHs = State.score > stats.hs;
   
-  // Save Stats
   localStorage.setItem('stats_' + State.cat, JSON.stringify({
     hs: Math.max(stats.hs, State.score),
     avgT: stats.plays === 0 ? avg : Math.round((stats.avgT + avg) / 2),
@@ -396,7 +343,6 @@ function endGame() {
     plays: (stats.plays || 0) + 1
   }));
 
-  // Render Results
   document.getElementById('result-num').textContent = State.score;
   document.getElementById('new-record').style.display = isNewHs ? 'block' : 'none';
   document.getElementById('res-acc').textContent = acc + '%';
@@ -415,117 +361,63 @@ function endGame() {
 function renderHistory() {
   const container = document.getElementById('history-list');
   container.innerHTML = '';
-  
   [...State.history].reverse().slice(0, 10).forEach(h => {
     const item = document.createElement('div');
     item.className = `history-item ${h.ok ? 'correct' : ''}`;
-    item.innerHTML = `
-      <div style="flex:1">
-        ${h.q} = <b>${h.ua}</b> 
-        ${!h.ok ? `<span style="color:var(--text-dim); font-size: 0.9em;"> (helyes: ${h.ca})</span>` : ''}
-      </div>
-      <div style="font-size:10px; opacity:0.6; font-family: var(--font-num);">${Math.round(h.rt)}ms</div>
-    `;
+    item.innerHTML = `<div style="flex:1">${h.q} = <b>${h.ua}</b> ${!h.ok ? `<span style="color:var(--text-dim); font-size: 0.9em;"> (helyes: ${h.ca})</span>` : ''}</div><div style="font-size:11px; opacity:0.6; font-family: var(--font-num);">${Math.round(h.rt)}ms</div>`;
     container.appendChild(item);
   });
 }
 
-// --- UI & INPUT ---
 function handleKey(v) {
   if (State.isInputLocked) return;
-
-  if (v === 'OK') {
-    submit();
-  } else if (v === 'DEL') {
-    State.input = State.input.slice(0, -1);
-  } else {
-    // Prevent multiple commas/dots
+  if (v === 'OK') submit();
+  else if (v === 'DEL') State.input = State.input.slice(0, -1);
+  else {
     if ((v === '.' || v === ',') && (State.input.includes('.') || State.input.includes(','))) return;
     if (State.input.length < 8) State.input += v;
   }
-  
-  const displayInput = State.input.replace('.', ',');
-  document.getElementById('answer-text').textContent = displayInput;
+  document.getElementById('answer-text').textContent = State.input.replace('.', ',');
   document.getElementById('answer-box').classList.toggle('has-input', State.input.length > 0);
 }
 
 function rebuildKeyboard(showDot) {
   const grid = document.getElementById('kb-grid');
   grid.innerHTML = '';
-  
-  // Standard numbers 1-9
   [1, 2, 3, 4, 5, 6, 7, 8, 9].forEach(n => {
-    const b = document.createElement('button');
-    b.className = 'kb-btn';
-    b.textContent = n;
-    b.onclick = () => handleKey(n.toString());
-    grid.appendChild(b);
+    const b = document.createElement('button'); b.className = 'kb-btn'; b.textContent = n;
+    b.onclick = () => handleKey(n.toString()); grid.appendChild(b);
   });
-
-  // Backspace
-  const del = document.createElement('button');
-  del.className = 'kb-btn';
-  del.textContent = '⌫';
-  del.onclick = () => handleKey('DEL');
-  grid.appendChild(del);
-
-  // Zero
-  const zero = document.createElement('button');
-  zero.className = 'kb-btn';
-  zero.textContent = '0';
-  zero.onclick = () => handleKey('0');
-  grid.appendChild(zero);
-
-  // Conditional Dot/Comma
+  const del = document.createElement('button'); del.className = 'kb-btn'; del.textContent = '⌫'; del.onclick = () => handleKey('DEL'); grid.appendChild(del);
+  const zero = document.createElement('button'); zero.className = 'kb-btn'; zero.textContent = '0'; zero.onclick = () => handleKey('0'); grid.appendChild(zero);
   if (showDot) {
-    const dot = document.createElement('button');
-    dot.className = 'kb-btn';
-    dot.textContent = ',';
-    dot.onclick = () => handleKey('.');
-    grid.appendChild(dot);
+    const dot = document.createElement('button'); dot.className = 'kb-btn'; dot.textContent = ','; dot.onclick = () => handleKey('.'); grid.appendChild(dot);
   }
-
-  // OK Button
-  const ok = document.createElement('button');
-  ok.className = 'kb-btn kb-ok';
-  ok.style.gridColumn = showDot ? 'span 3' : 'span 1';
-  ok.textContent = 'OK';
-  ok.onclick = () => handleKey('OK');
-  grid.appendChild(ok);
+  const ok = document.createElement('button'); ok.className = 'kb-btn kb-ok'; ok.style.gridColumn = showDot ? 'span 3' : 'span 1'; ok.textContent = 'OK'; ok.onclick = () => handleKey('OK'); grid.appendChild(ok);
 }
 
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
   const target = document.getElementById(id);
-  if (target) {
-    target.classList.remove('hidden');
-    target.scrollTop = 0;
-  }
+  if (target) { target.classList.remove('hidden'); target.scrollTop = 0; }
 }
 
-// --- INITIALIZATION ---
 (function initStars() {
   const c = document.getElementById('stars-canvas');
   const ctx = c.getContext('2d');
   const resize = () => {
-    c.width = window.innerWidth;
-    c.height = window.innerHeight;
+    c.width = window.innerWidth; c.height = window.innerHeight;
     ctx.clearRect(0,0,c.width, c.height);
     for (let i = 0; i < 70; i++) {
-      ctx.beginPath();
-      ctx.arc(Math.random() * c.width, Math.random() * c.height, Math.random() * 1.5, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.4})`;
-      ctx.fill();
+      ctx.beginPath(); ctx.arc(Math.random() * c.width, Math.random() * c.height, Math.random() * 1.5, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.4})`; ctx.fill();
     }
   };
-  window.onresize = resize;
-  resize();
+  window.onresize = resize; resize();
 })();
 
 document.getElementById('btn-home').onclick = renderHome;
 document.getElementById('btn-retry').onclick = () => startGame(State.cat);
-
-// Start
 renderHome();
 </script>
 </body>
