@@ -2,424 +2,275 @@
 <html lang="hu">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>MatekSprint Pro - Pedagogical Edition</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>MatekSprint Pro - Refactored</title>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Nunito:wght@500;700;800;900&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root { --bg: #0f0f1a; --surface: #1a1a2e; --surface2: #252540; --text: #f0f0ff; --text-dim: #8888aa; --c1: #4cc9f0; --c2: #ff9e00; --c3: #06d6a0; --c4: #ff6b9d; --danger: #ff4d6d; --ok: #06d6a0; --font-ui: 'Nunito', sans-serif; --font-num: 'Space Mono', monospace; --safe-top: env(safe-area-inset-top, 0px); --safe-bot: env(safe-area-inset-bottom, 0px); --accent: #4cc9f0; }
-    html, body { height: 100%; width: 100%; overflow: hidden; touch-action: manipulation; -webkit-tap-highlight-color: transparent; font-family: var(--font-ui); background: var(--bg); color: var(--text); }
-    .stars-bg { position: fixed; inset: 0; pointer-events: none; z-index: -1; }
-    .screen { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; padding-top: calc(var(--safe-top) + 12px); padding-bottom: calc(var(--safe-bot) + 12px); padding-left: 16px; padding-right: 16px; transition: opacity .18s ease, transform .18s ease; overflow: hidden; }
-    .screen.hidden { opacity: 0; pointer-events: none; transform: scale(.96); }
-    #home { justify-content: flex-start; overflow-y: auto; }
-    .home-header { width: 100%; text-align: center; padding: 24px 0 32px; flex-shrink: 0; }
-    .logo { font-family: var(--font-num); font-size: clamp(34px, 10vw, 44px); font-weight: 700; letter-spacing: -1px; background: linear-gradient(135deg, #4cc9f0, #ff6b9d); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-    .logo-sub { font-size: 15px; color: var(--text-dim); margin-top: 6px; letter-spacing: 1px; text-transform: uppercase; font-weight: 700; }
-    .categories { width: 100%; display: flex; flex-direction: column; gap: 16px; padding-bottom: 60px; max-width: 500px; }
-    .cat-btn { --c: var(--c1); background: var(--surface); border: 2px solid color-mix(in srgb, var(--c) 40%, transparent); border-radius: 24px; padding: 22px 16px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px; transition: transform .12s, background .2s; -webkit-user-select: none; user-select: none; position: relative; overflow: hidden; }
-    .cat-btn::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--c) 18%, transparent), transparent 75%); }
-    .cat-btn:active { transform: scale(.96); background: var(--surface2); }
-    .cat-name { font-size: 18px; font-weight: 900; text-align: center; color: var(--text); line-height: 1.2; text-transform: uppercase; letter-spacing: 0.5px; }
-    .cat-hs { font-family: var(--font-num); font-size: 13px; color: var(--text-dim); margin-top: 4px; }
-    .cat-hs b { color: var(--c); font-weight: 700; }
-    #game { justify-content: space-between; gap: 8px; }
-    .game-topbar { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 6px 4px; }
-    .score-num { font-family: var(--font-num); font-size: 36px; font-weight: 700; color: var(--text); line-height: 1; transition: transform .1s; }
-    .score-num.bump { transform: scale(1.3); color: var(--ok); }
-    .timer-num { font-family: var(--font-num); font-size: 44px; font-weight: 700; color: var(--text); line-height: 1; }
-    .timer-num.danger { color: var(--danger); animation: shake 0.5s infinite; }
-    @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-2px); } 75% { transform: translateX(2px); } }
-    .progress-bar { width: 100%; height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
-    .progress-fill { height: 100%; width: 100%; background: var(--accent); transition: width 1.05s linear; }
-    .task-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; width: 100%; position: relative; }
-    .task-eq { font-family: var(--font-num); font-size: clamp(36px, 12vw, 56px); font-weight: 700; color: var(--text); text-align: center; }
-    #visual-canvas { display: none; width: 200px; height: 200px; background: var(--surface2); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); margin-top: 10px; }
-    #level-up-pop { position: absolute; top: 15%; font-weight: 900; font-size: 28px; color: #ffd60a; text-shadow: 0 0 15px rgba(255,214,10,0.5); pointer-events: none; opacity: 0; transform: translateY(20px); transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 20; }
-    #level-up-pop.show { opacity: 1; transform: translateY(0); }
-    #tip-pop { position: absolute; bottom: 10%; background: var(--surface2); border: 2px solid var(--accent); padding: 14px 20px; border-radius: 16px; font-size: 14px; color: var(--text); max-width: 85%; text-align: center; opacity: 0; pointer-events: none; transform: translateY(10px); transition: all 0.3s; z-index: 10; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-    #tip-pop.show { opacity: 1; transform: translateY(0); }
-    #tip-pop b { color: var(--accent); display: block; margin-bottom: 4px; font-size: 12px; text-transform: uppercase; }
-    .answer-box { font-family: var(--font-num); font-size: clamp(32px, 8vw, 46px); font-weight: 700; color: var(--accent); min-width: 180px; max-width: 95%; min-height: 80px; background: var(--surface); border: 3px solid color-mix(in srgb, var(--accent) 30%, transparent); border-radius: 20px; display: flex; align-items: center; justify-content: center; padding: 0 16px; overflow-wrap: anywhere; text-align: center; line-height: 1.2; }
-    .answer-box.has-input { border-color: var(--accent); }
-    .cursor { display: inline-block; width: 3px; height: 1em; background: var(--accent); margin-left: 4px; animation: blink .8s step-end infinite; vertical-align: text-bottom; }
-    @keyframes blink { 50% { opacity: 0; } }
-    .keyboard { width: 100%; max-width: 360px; padding-bottom: 8px; }
-    .kb-grid { display: grid; gap: 10px; }
-    .kb-btn { font-family: var(--font-num); font-size: 26px; font-weight: 700; background: var(--surface); border: 2px solid var(--surface2); border-radius: 16px; color: var(--text); cursor: pointer; aspect-ratio: 1.4; display: flex; align-items: center; justify-content: center; transition: background .1s, transform .1s; -webkit-user-select: none; }
-    .kb-btn:active { background: var(--surface2); transform: scale(0.92); }
-    .kb-btn.kb-ok { background: var(--accent); border-color: var(--accent); color: #fff; }
-    #result { justify-content: flex-start; overflow-y: auto; }
-    .result-num { font-family: var(--font-num); font-size: 80px; font-weight: 700; color: var(--accent); line-height: 1; }
-    .result-hs-wrap { background: var(--surface); border-radius: 24px; padding: 20px; width: 100%; max-width: 320px; margin-top: 10px; }
-    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; border-top: 1px solid var(--surface2); padding-top: 12px; }
-    .stat-box { font-size: 14px; color: var(--text-dim); }
-    .stat-box b { display: block; color: var(--text); font-size: 18px; font-family: var(--font-num); }
-    .history-list { display: flex; flex-direction: column; gap: 10px; width: 100%; margin-top: 20px; }
-    .history-item { display: flex; align-items: center; background: var(--surface); padding: 14px; border-radius: 14px; border-left: 5px solid var(--danger); gap: 12px; font-size: 15px; }
-    .history-item.correct { border-left-color: var(--ok); }
-    .btn-primary { width: 100%; max-width: 320px; padding: 20px; border-radius: 20px; background: var(--accent); color: #fff; font-weight: 800; border: none; font-size: 20px; cursor: pointer; transition: transform .1s; }
-    .btn-primary:active { transform: scale(0.96); }
-    .btn-secondary { width: 100%; max-width: 320px; padding: 20px; border-radius: 20px; background: var(--surface2); color: var(--text); font-weight: 800; border: 2px solid var(--surface2); font-size: 20px; cursor: pointer; transition: transform .1s; }
-    .btn-secondary:active { transform: scale(0.96); }
-    .task-eq.word-problem { font-size: clamp(18px, 5vw, 24px); line-height: 1.4; padding: 0 10px; max-width: 90%; font-family: var(--font-ui); }
-    .task-eq.target-problem { font-size: clamp(24px, 6vw, 36px); color: var(--c3); }
+    :root { 
+        --bg: #0f0f1a; --surface: #1a1a2e; --surface2: #252540; --text: #f0f0ff; 
+        --text-dim: #8888aa; --c1: #4cc9f0; --c2: #ff9e00; --c3: #06d6a0; --c4: #ff6b9d; 
+        --danger: #ff4d6d; --ok: #06d6a0; --font-ui: 'Nunito', sans-serif; 
+        --font-num: 'Space Mono', monospace; 
+        --safe-top: env(safe-area-inset-top, 20px); 
+        --safe-bot: env(safe-area-inset-bottom, 20px); 
+        --accent: #4cc9f0; 
+    }
+    
+    html, body { 
+        height: 100dvh; /* Dynamic Viewport Height iOS-hez */
+        width: 100vw; 
+        overflow: hidden; 
+        touch-action: manipulation; 
+        background: var(--bg); 
+        color: var(--text); 
+        font-family: var(--font-ui);
+    }
+
+    .screen { 
+        position: absolute; 
+        inset: 0; 
+        display: flex; 
+        flex-direction: column; 
+        padding: var(--safe-top) 16px var(--safe-bot); 
+        transition: opacity .18s ease; 
+    }
+
+    /* Görgethető tartalom a fix billentyűzet felett */
+    .scroll-content {
+        flex: 1;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        padding-bottom: 10px;
+    }
+
+    .hidden { opacity: 0; pointer-events: none; }
+
+    /* Rács stílusa */
+    #visual-container { 
+        display: none; 
+        flex-direction: column; 
+        align-items: center; 
+        gap: 8px; 
+    }
+    .grid-label { font-size: 14px; color: var(--text-dim); font-weight: 700; }
+    #visual-canvas { 
+        width: min(220px, 50vw); 
+        height: min(220px, 50vw); 
+        background: var(--surface2); 
+        border-radius: 8px; 
+        border: 2px solid var(--surface2);
+    }
+
+    /* Billentyűzet - Fixált alulra */
+    .keyboard { 
+        width: 100%; 
+        max-width: 400px; 
+        margin: 0 auto;
+        padding-top: 10px;
+        flex-shrink: 0;
+    }
+    .kb-grid { 
+        display: grid; 
+        grid-template-columns: repeat(3, 1fr); 
+        gap: 8px; 
+    }
+    .kb-btn { 
+        font-family: var(--font-num); 
+        font-size: 24px; 
+        font-weight: 700; 
+        background: var(--surface); 
+        border: 1px solid var(--surface2); 
+        border-radius: 12px; 
+        color: var(--text); 
+        height: 54px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        -webkit-user-select: none;
+    }
+    .kb-btn:active { background: var(--surface2); transform: scale(0.95); }
+    .kb-ok { 
+        background: var(--accent); 
+        color: #fff; 
+        grid-column: span 3; /* Teljes szélesség, hogy ne maradhasson le */
+        font-weight: 900;
+        margin-top: 4px;
+    }
+
+    .task-eq { font-family: var(--font-num); font-size: 32px; text-align: center; margin: 10px 0; }
+    .answer-box { font-family: var(--font-num); font-size: 38px; color: var(--accent); min-height: 70px; width: 100%; max-width: 300px; background: var(--surface); border-radius: 15px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--surface2); }
+    
+    /* Star background fix */
+    .stars-bg { position: fixed; inset: 0; z-index: -1; }
   </style>
 </head>
 <body>
 <canvas class="stars-bg" id="stars-canvas"></canvas>
 
 <div class="screen" id="home">
-  <div class="home-header"><div class="logo">MatekSprint</div><div class="logo-sub">Gyakorolj naponta!</div></div>
-  <div class="categories" id="cat-list"></div>
+    <div class="scroll-content">
+        <div style="padding: 40px 0; text-align: center;">
+            <h1 style="font-family: var(--font-num); font-size: 38px;">MatekSprint</h1>
+            <p style="color: var(--text-dim);">VÁLASSZ KATEGÓRIÁT</p>
+        </div>
+        <div id="cat-list" style="width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 12px;"></div>
+    </div>
 </div>
 
 <div class="screen hidden" id="game">
-  <div class="game-topbar">
-    <div class="score-display"><div class="score-num" id="score-num">0</div></div>
-    <div class="timer-wrap"><div class="timer-num" id="timer-num">60</div></div>
-  </div>
-  <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
-  <div class="task-area">
-    <div id="level-up-pop">LEVEL UP! 🚀</div>
-    <div id="tip-pop"><b>Pro-Tipp</b><span id="tip-text"></span></div>
-    <div class="cat-badge" id="cat-badge" style="font-size: 14px; opacity: 0.8; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 800; color: var(--accent);"></div>
-    <div class="task-eq" id="task-eq"></div>
-    <canvas id="visual-canvas" width="200" height="200"></canvas>
-    <div class="answer-box" id="answer-box"><span id="answer-text"></span><span class="cursor"></span></div>
-  </div>
-  <div class="keyboard"><div class="kb-grid" id="kb-grid"></div></div>
+    <div class="scroll-content">
+        <div style="display: flex; justify-content: space-between; width: 100%; font-family: var(--font-num); font-size: 24px;">
+            <span id="score-num">0</span>
+            <span id="timer-num">60</span>
+        </div>
+        <div id="task-eq" class="task-eq"></div>
+        <div id="visual-container">
+            <span class="grid-label">10 × 10-ES RÁCS</span>
+            <canvas id="visual-canvas" width="200" height="200"></canvas>
+        </div>
+        <div class="answer-box"><span id="answer-text"></span><span style="width:2px; height:30px; background:var(--accent); margin-left:5px;"></span></div>
+    </div>
+    <div class="keyboard">
+        <div class="kb-grid" id="kb-grid"></div>
+        <button class="kb-btn kb-ok" onclick="submit()">BEKÜLDÉS</button>
+    </div>
 </div>
 
 <div class="screen hidden" id="result">
-  <div class="result-top" style="text-align: center; width: 100%; display: flex; flex-direction: column; align-items: center;">
-    <div class="result-num" id="result-num">0</div>
-    <div class="stars" id="result-stars" style="font-size: 28px; margin: 8px 0;">⭐⭐⭐</div>
-    <div class="result-hs-wrap">
-      <div id="new-record" style="color:#ffd60a; font-weight:900; display:none; margin-bottom: 8px; font-size: 18px;">🏆 ÚJ REKORD!</div>
-      <div class="stats-grid">
-        <div class="stat-box">Pontosság<b id="res-acc">0%</b></div>
-        <div class="stat-box">Összesen<b id="res-total">0 db</b></div> <div class="stat-box">Átlagidő<b id="res-time">0ms</b></div>
-        <div class="stat-box">Elért szint<b id="res-level">1</b></div>
-      </div>
+    <div class="scroll-content">
+        <h2 style="font-size: 60px; color: var(--accent);" id="result-num">0</h2>
+        <div id="res-stats" style="text-align: center; margin-bottom: 20px;"></div>
+        <button class="kb-btn kb-ok" style="max-width: 300px;" onclick="renderHome()">VISSZA A MENÜBE</button>
+        <div id="history-list" style="width: 100%; margin-top: 20px;"></div>
     </div>
-    <div class="result-btns" style="margin-top:24px; width:100%; display:flex; flex-direction:column; align-items:center; gap:12px;">
-      <button class="btn-primary" id="btn-retry">Újra!</button>
-      <button class="btn-secondary" id="btn-home">Vissza a menübe</button> </div>
-  </div>
-  <div class="history-wrap" style="width: 100%; max-width: 400px; padding-bottom: 50px;"><div class="history-list" id="history-list"></div></div>
 </div>
 
 <script>
-/**
- * MatekSprint Pro - Pedagogical Edition
- */
-
-const WORD_PROBLEM_TEMPLATES = [
-  { gen: () => { const baseQty = (rand(2, 5) / 10); return { q: `Egy sütihez ${fmt(baseQty)} kg liszt kell. Mennyi kell 3 ugyanilyen sütihez?`, a: fmt(baseQty * 3), hint: "Szorzás: Alapanyag × 3" }; } },
-  { gen: () => { const temp = rand(15, 25) + 0.5; const rise = rand(2, 5) / 10; return { q: `Reggel ${fmt(temp)} °C volt, délutánra emelkedett ${fmt(rise)} °C-ot. Hány fok van most?`, a: fmt(temp + rise), hint: "Összeadás: Alaphőmérséklet + emelkedés" }; } },
-  { gen: () => { const total = (rand(10, 40) / 10); return { q: `Egy ${fmt(total)} méteres kötelet kettévágtunk. Hány méter egy darab?`, a: fmt(total / 2), hint: "Osztás: Teljes hossz ÷ 2" }; } },
-  { gen: () => { const wallet = rand(10, 20) * 100; const spent = rand(5, 9) * 100 + 0.5; return { q: `Volt ${fmt(wallet)} Ft-od, elköltöttél ${fmt(spent)} Ft-ot. Mennyi maradt?`, a: fmt(wallet - spent), hint: "Kivonás: Eredeti összeg - költés" }; } }
-];
-
+// --- KONSTANSOK ÉS ÁLLAPOT ---
 const CATS = {
-  szorzas: { id: 'szorzas', name:'Szorzótábla', color:'#4cc9f0', bBase: 1800, bInc: 200, gen: (l) => { const a=rand(2, 5+l*2), b=rand(2, 9); return {q:`${a} × ${b}`, a:(a*b).toString(), k:`${a}x${b}`, p:[a, b]} } },
-  osztas: { id: 'osztas', name:'Osztás', color:'#ff9e00', bBase: 2500, bInc: 300, gen: (l) => { const b=rand(2, 6+l), c=rand(2, 8+l); return {q:`${b*c} ÷ ${b}`, a:c.toString(), k:`${b*c}d${b}`, p:[b*c, b]} } },
-  tszorz: { id: 'tszorz', name:'Tizedes szorzás', color:'#06d6a0', bBase: 3500, bInc: 400, gen: (l) => { let a, b; if (l <= 1) { a = rand(2, 9) / 10; b = rand(2, 9); } else if (l === 2) { const m = [10, 100][rand(0, 1)]; a = rand(11, 999) / 10; b = m; } else { a = rand(2, 12) / 10; b = rand(2, 5) / 10; } return { q: `${fmt(a)} × ${fmt(b)}`, a: fmt(a * b), k: `${a}x${b}`, p:[a, b] }; } },
-  toszt: { id: 'toszt', name:'Tizedes osztás', color:'#ff6b9d', bBase: 4500, bInc: 500, gen: (l) => { const c=rand(1,30+(l*10)), b=rand(2,5); return {q:`${fmt(c*b/10)} ÷ ${b}`, a:fmt(c/10), k:`${c}d${b}`, p:[c*b/10, b]} } },
-  tort: { id: 'tort', name:'Törtek', color:'#ffd166', bBase: 5500, bInc: 200, gen: (l) => { const d=[2,4,5,8,10,20,25][Math.min(6, l)]; const n=rand(1,d-1); return {q:`${n} / ${d}`, a:fmt(n/d), k:`${n}/${d}`, p:[n, d]} } }
+    tszorz: { name: 'Tizedes szorzás', color: '#06d6a0', gen: (l) => ({ q: `${(rand(2, 9)/10).toFixed(1)} × ${rand(2, 9)}`, a: null }) },
+    grid: { name: 'Rács-arány', color: '#ff6b9d', gen: () => { const f = rand(10, 90); return { q: 'Hányad része színes?', a: (f/100).toString(), isVisual: true, val: f }; } }
 };
 
-let State = { cat: null, score: 0, time: 60, timerInterval: null, task: null, input: '', history: [], mistakes: [], level: 1, streak: 0, startTime: 0, isInputLocked: false, recentTasks: [], totalSolved: 0 };
+let State = { cat: 'grid', score: 0, time: 60, input: '', task: null, history: [] };
 const rand = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
-const fmt = (n) => parseFloat(Number(n).toFixed(8)).toString();
 
-function getStats(id) { try { return JSON.parse(localStorage.getItem('stats_' + id)) || { hs: 0, avgT: 0, acc: 0, plays: 0 }; } catch (e) { return { hs: 0, avgT: 0, acc: 0, plays: 0 }; } }
-
-function analyzeError(task, userInput, catId) {
-  if (task.isTargetMode || task.isVisual) return null;
-  const val = parseFloat(userInput.replace(',', '.'));
-  const correct = parseFloat(task.a.replace(',', '.'));
-  if ((catId === 'tszorz' || catId === 'toszt') && (val === correct * 10 || val === correct / 10)) return "Figyelj a tizedeshelyekre!";
-  if (task.hint) return task.hint;
-  return null;
-}
-
-function showTip(msg) {
-  const pop = document.getElementById('tip-pop');
-  document.getElementById('tip-text').textContent = msg;
-  pop.classList.add('show');
-  setTimeout(() => pop.classList.remove('show'), 3500);
-}
-
-function safeEvaluate(expr) {
-  let parseStr = expr.replace(/,/g, '.').replace(/×/g, '*').replace(/÷/g, '/');
-  if (!/^[0-9\+\-\*\/\.\(\) ]+$/.test(parseStr)) return null;
-  try { return Function('"use strict";return (' + parseStr + ')')(); } catch { return null; }
-}
-
-function renderHome() {
-  const container = document.getElementById('cat-list'); container.innerHTML = '';
-  Object.values(CATS).forEach(cat => {
-    const stats = getStats(cat.id);
-    const btn = document.createElement('div'); btn.className = 'cat-btn'; btn.style.setProperty('--c', cat.color);
-    btn.innerHTML = `<div class="cat-name">${cat.name}</div><div class="cat-hs">Rekord: <b>${stats.hs}</b> | Átl: <b>${stats.avgT}ms</b></div>`;
-    btn.onclick = () => startGame(cat.id); container.appendChild(btn);
-  });
-  showScreen('home');
-}
-
-function drawGrid(filled) {
-  const c = document.getElementById('visual-canvas');
-  const ctx = c.getContext('2d');
-  ctx.clearRect(0, 0, c.width, c.height);
-  const size = c.width / 10;
-  const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
-  const surface2 = getComputedStyle(document.documentElement).getPropertyValue('--surface2').trim();
-  for (let i = 0; i < 100; i++) {
-    const x = (i % 10) * size;
-    const y = Math.floor(i / 10) * size;
-    ctx.fillStyle = i < filled ? accent : surface2;
-    ctx.fillRect(x + 1, y + 1, size - 2, size - 2);
-  }
-}
-
-function generateGridTask() {
-  const filled = rand(5, 95);
-  return { q: "A terület hányad része színes?", a: fmt(filled / 100), isVisual: true, gridVal: filled, k: 'grid_' + filled };
-}
-
-function generateTargetTask() {
-  const n1 = rand(2, 6); const n2 = rand(2, 5); const n3 = [0.5, 1.5, 2][rand(0, 2)];
-  const target = (n1 * n3) + n2;
-  return { q: `Érd el a célszámot: ${target}`, nums: [n1, n2, n3], a: target.toString(), isTargetMode: true, k: 'target_' + target };
-}
-
+// --- LOGIKA ---
 function startGame(id) {
-  if (State.timerInterval) clearInterval(State.timerInterval);
-  State = { cat: id, score: 0, time: 60, timerInterval: null, task: null, input: '', history: [], mistakes: [], level: 1, streak: 0, startTime: 0, isInputLocked: false, recentTasks: [], totalSolved: 0 };
-  const catCfg = CATS[id];
-  document.documentElement.style.setProperty('--accent', catCfg.color);
-  document.getElementById('cat-badge').textContent = catCfg.name;
-  document.getElementById('score-num').textContent = '0';
-  document.getElementById('timer-num').textContent = '60';
-  document.getElementById('timer-num').classList.remove('danger');
-  document.getElementById('progress-fill').style.width = '100%';
-  nextTask(); 
-  showScreen('game');
-  State.timerInterval = setInterval(() => {
-    State.time--;
-    const timerEl = document.getElementById('timer-num'); timerEl.textContent = State.time;
-    document.getElementById('progress-fill').style.width = (State.time / 60 * 100) + '%';
-    if (State.time <= 10) timerEl.classList.add('danger');
-    if (State.time <= 0) endGame();
-  }, 1000);
+    State = { cat: id, score: 0, time: 60, input: '', history: [] };
+    showScreen('game');
+    nextTask();
+    startTimer();
 }
 
 function nextTask() {
-  State.input = ''; 
-  State.isInputLocked = false;
-  State.totalSolved++;
-  document.getElementById('answer-text').textContent = '';
-  document.getElementById('answer-box').classList.remove('has-input');
-  
-  let selectedTask = null;
-  const lastKey = State.task ? State.task.k : null;
-
-  if (State.totalSolved < 3 && ['tszorz', 'toszt'].includes(State.cat)) {
-    selectedTask = generateGridTask();
-  } else if (State.level >= 4 && State.totalSolved % 6 === 0) {
-    selectedTask = generateTargetTask();
-  } else if (State.totalSolved % 7 === 0) {
-    selectedTask = WORD_PROBLEM_TEMPLATES[rand(0, WORD_PROBLEM_TEMPLATES.length - 1)].gen();
-    selectedTask.isWord = true;
-    selectedTask.k = 'word_' + State.totalSolved;
-  } else {
-    if (State.mistakes.length > 0 && Math.random() < 0.25) {
-      const validMistakes = State.mistakes.filter(m => m.k !== lastKey);
-      if (validMistakes.length > 0) selectedTask = validMistakes[rand(0, validMistakes.length - 1)];
+    State.input = '';
+    document.getElementById('answer-text').textContent = '';
+    
+    // 5. osztályos logika: néha dobjunk be rácsot a tizedeseknél
+    if (Math.random() > 0.7 || State.cat === 'grid') {
+        State.task = CATS.grid.gen();
+    } else {
+        State.task = CATS.tszorz.gen();
+        const parts = State.task.q.split(' × ');
+        State.task.a = (parseFloat(parts[0]) * parseFloat(parts[1])).toFixed(2).replace(/\.00$/, '').replace(/\.0$/, '');
     }
-    if (!selectedTask) {
-      let attempts = 0;
-      while (attempts < 15) {
-        const t = CATS[State.cat].gen(State.level);
-        if (t.k !== lastKey && !State.recentTasks.includes(t.k)) { selectedTask = t; break; }
-        attempts++;
-      }
-      if (!selectedTask) selectedTask = CATS[State.cat].gen(State.level);
-    }
-  }
 
-  State.task = selectedTask;
-  if (!selectedTask.isWord && !selectedTask.isTargetMode && !selectedTask.isVisual) {
-    State.recentTasks.push(selectedTask.k);
-    if (State.recentTasks.length > 8) State.recentTasks.shift();
-  }
-  
-  rebuildKeyboard();
-
-  const eqEl = document.getElementById('task-eq');
-  eqEl.textContent = selectedTask.isWord || selectedTask.isVisual || selectedTask.isTargetMode ? selectedTask.q : `${selectedTask.q} = ?`;
-  eqEl.className = selectedTask.isWord ? 'task-eq word-problem' : selectedTask.isTargetMode ? 'task-eq target-problem' : 'task-eq';
-  
-  const canvas = document.getElementById('visual-canvas');
-  if (selectedTask.isVisual) {
-    canvas.style.display = 'block';
-    setTimeout(() => drawGrid(selectedTask.gridVal), 10);
-  } else {
-    canvas.style.display = 'none';
-  }
-
-  State.startTime = performance.now();
+    document.getElementById('task-eq').textContent = State.task.isVisual ? State.task.q : `${State.task.q} = ?`;
+    document.getElementById('visual-container').style.display = State.task.isVisual ? 'flex' : 'none';
+    if (State.task.isVisual) drawGrid(State.task.val);
+    
+    renderKeyboard();
 }
 
-function handleKey(v) {
-  if (State.isInputLocked) return;
-  if (v === 'DEL') State.input = State.input.slice(0, -1);
-  else if (v === 'OK') submit();
-  else { 
-    if (State.task && State.task.isTargetMode && State.input.length < 25) {
-      State.input += v;
-    } else if (!State.task || !State.task.isTargetMode) {
-      if ((v === '.' || v === ',') && (State.input.includes('.') || State.input.includes(','))) return; 
-      if (State.input.length < 12) State.input += v; 
+function drawGrid(filled) {
+    const canvas = document.getElementById('visual-canvas');
+    const ctx = canvas.getContext('2d');
+    const s = 20; // 200/10
+    ctx.clearRect(0,0,200,200);
+    
+    for(let i=0; i<100; i++) {
+        const x = (i % 10) * s;
+        const y = Math.floor(i / 10) * s;
+        
+        // Alapszín
+        ctx.fillStyle = i < filled ? '#4cc9f0' : '#252540';
+        ctx.fillRect(x + 1, y + 1, s - 2, s - 2);
+        
+        // 5x5-ös vastagabb segédvonalak (pedagógiai segítség 12 éveseknek)
+        ctx.strokeStyle = '#0f0f1a';
+        ctx.lineWidth = 0.5;
+        if ((i+1) % 5 === 0) ctx.lineWidth = 2;
+        ctx.strokeRect(x, y, s, s);
     }
-  }
-  document.getElementById('answer-text').textContent = State.input.replace(/\./g, ',').replace(/\*/g, '×').replace(/\//g, '÷');
-  document.getElementById('answer-box').classList.toggle('has-input', State.input.length > 0);
 }
 
-function rebuildKeyboard() {
-  const grid = document.getElementById('kb-grid'); grid.innerHTML = '';
-  
-  if (State.task && State.task.isTargetMode) {
-    grid.style.gridTemplateColumns = 'repeat(4, 1fr)';
-    const keys = [...State.task.nums.map(n => n.toString().replace('.', ',')), 'DEL', '+', '-', '×', '÷', '(', ')'];
-    keys.forEach(v => {
-      const b = document.createElement('button'); 
-      b.className = 'kb-btn';
-      b.textContent = v === 'DEL' ? '⌫' : v; 
-      b.onclick = () => handleKey(v === '×' ? '*' : v === '÷' ? '/' : v);
-      grid.appendChild(b);
+function renderKeyboard() {
+    const container = document.getElementById('kb-grid');
+    container.innerHTML = '';
+    const keys = [1,2,3,4,5,6,7,8,9,',',0,'⌫'];
+    keys.forEach(k => {
+        const btn = document.createElement('div');
+        btn.className = 'kb-btn';
+        btn.textContent = k;
+        btn.onclick = () => {
+            if (k === '⌫') State.input = State.input.slice(0, -1);
+            else if (State.input.length < 8) State.input += k;
+            document.getElementById('answer-text').textContent = State.input;
+        };
+        container.appendChild(btn);
     });
-    const ok = document.createElement('button');
-    ok.className = 'kb-btn kb-ok';
-    ok.style.gridColumn = 'span 2';
-    ok.textContent = 'OK';
-    ok.onclick = () => handleKey('OK');
-    grid.appendChild(ok);
-    return;
-  }
-
-  grid.style.gridTemplateColumns = 'repeat(3, 1fr)';
-  const needsDot = ['tszorz', 'toszt', 'tort'].includes(State.cat) || (State.task && (State.task.isVisual || State.task.a.includes('.')));
-  const keys = [1, 2, 3, 4, 5, 6, 7, 8, 9, 'DEL', 0, needsDot ? ',' : 'OK'];
-  keys.forEach(v => {
-    const b = document.createElement('button'); 
-    b.className = 'kb-btn' + (v === 'OK' ? ' kb-ok' : '');
-    b.textContent = v === 'DEL' ? '⌫' : v; 
-    b.onclick = () => handleKey(v === ',' ? '.' : v);
-    grid.appendChild(b);
-  });
-  
-  if (needsDot) {
-    const ok = document.createElement('button');
-    ok.className = 'kb-btn kb-ok';
-    ok.style.gridColumn = 'span 3';
-    ok.textContent = 'OK';
-    ok.onclick = () => handleKey('OK');
-    grid.appendChild(ok);
-  }
 }
 
 function submit() {
-  if (!State.input || State.isInputLocked) return;
-  State.isInputLocked = true;
-  const rt = performance.now() - State.startTime;
-  
-  let isCorrect = false;
-  if (State.task && State.task.isTargetMode) {
-    const res = safeEvaluate(State.input);
-    isCorrect = (res !== null) && (Math.abs(res - parseFloat(State.task.a)) < 0.0001);
-  } else {
-    isCorrect = fmt(parseFloat(State.input.replace(',', '.'))) === State.task.a;
-  }
-
-  State.history.push({ q: State.task.q, ua: State.input, ca: State.task.a, ok: isCorrect, rt, isTarget: State.task.isTargetMode });
-  
-  let nextDelay = 150;
-  if (isCorrect) {
-    State.streak++;
-    State.score += (State.task.isWord ? 5 : State.task.isTargetMode ? 10 : 1);
-    if (State.streak >= 5 && State.level < 5) { State.level++; showLevelUp(); }
-    const el = document.getElementById('score-num'); el.textContent = State.score; el.classList.add('bump');
-    setTimeout(() => el.classList.remove('bump'), 200);
-  } else {
-    State.streak = 0;
-    const tip = analyzeError(State.task, State.input, State.cat);
-    if (tip) { showTip(tip); nextDelay = 2500; }
-    if (!State.task.isWord && !State.task.isTargetMode && !State.task.isVisual && !State.mistakes.find(m => m.k === State.task.k)) State.mistakes.push(State.task);
-  }
-  setTimeout(nextTask, nextDelay);
+    if (!State.input) return;
+    const userAns = State.input.replace(',', '.');
+    const isCorrect = Math.abs(parseFloat(userAns) - parseFloat(State.task.a)) < 0.0001;
+    
+    if (isCorrect) State.score++;
+    State.history.push({ q: State.task.q, a: State.task.a, ua: State.input, ok: isCorrect });
+    
+    document.getElementById('score-num').textContent = State.score;
+    nextTask();
 }
 
-function showLevelUp() { const pop = document.getElementById('level-up-pop'); pop.textContent = `SZINT ${State.level} 🚀`; pop.classList.add('show'); setTimeout(() => pop.classList.remove('show'), 1500); }
-
-function endGame() {
-  if (State.timerInterval) clearInterval(State.timerInterval);
-  const stats = getStats(State.cat);
-  const total = State.history.length; 
-  const correct = State.history.filter(h => h.ok).length;
-  const acc = total ? Math.round((correct / total) * 100) : 0;
-  const avg = total ? Math.round(State.history.reduce((s, h) => s + h.rt, 0) / total) : 0;
-  
-  localStorage.setItem('stats_' + State.cat, JSON.stringify({ 
-    hs: Math.max(stats.hs, State.score), 
-    avgT: stats.plays === 0 ? avg : Math.round((stats.avgT + avg) / 2), 
-    acc: stats.plays === 0 ? acc : Math.round((stats.acc + acc) / 2), 
-    plays: (stats.plays || 0) + 1 
-  }));
-
-  document.getElementById('result-num').textContent = State.score;
-  document.getElementById('res-acc').textContent = acc + '%';
-  document.getElementById('res-total').textContent = total + ' db';
-  document.getElementById('res-time').textContent = avg + 'ms';
-  document.getElementById('res-level').textContent = State.level;
-  
-  renderHistory(); 
-  showScreen('result');
+// --- UTILS ---
+function startTimer() {
+    const timer = setInterval(() => {
+        State.time--;
+        document.getElementById('timer-num').textContent = State.time;
+        if (State.time <= 0) { clearInterval(timer); showScreen('result'); renderResult(); }
+    }, 1000);
 }
 
-function renderHistory() {
-  const container = document.getElementById('history-list'); 
-  container.innerHTML = '';
-  [...State.history].reverse().forEach(h => {
-    const item = document.createElement('div'); 
-    item.className = `history-item ${h.ok ? 'correct' : ''}`;
-    const shortQ = h.q.length > 45 ? h.q.substring(0, 42) + '...' : h.q;
-    const displayUa = h.ua.replace(/\./g, ',').replace(/\*/g, '×').replace(/\//g, '÷');
-    const displayCa = h.ca.replace('.', ',');
-    item.innerHTML = `
-      <div style="flex:1">
-        ${shortQ} = <b>${displayUa}</b> 
-        ${!h.ok ? `<span style="color:var(--text-dim); font-size: 0.9em;"> (${displayCa})</span>` : ''}
-      </div>
-      <div style="font-size:11px; opacity:0.6;">${Math.round(h.rt)}ms</div>
-    `;
-    container.appendChild(item);
-  });
+function renderResult() {
+    document.getElementById('result-num').textContent = State.score;
 }
 
-function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden')); const target = document.getElementById(id); if (target) target.classList.remove('hidden'); }
+function renderHome() {
+    const list = document.getElementById('cat-list');
+    list.innerHTML = '';
+    Object.keys(CATS).forEach(k => {
+        const b = document.createElement('div');
+        b.className = 'kb-btn';
+        b.style.borderColor = CATS[k].color;
+        b.textContent = CATS[k].name;
+        b.onclick = () => startGame(k);
+        list.appendChild(b);
+    });
+    showScreen('home');
+}
 
-(function initStars() {
-  const c = document.getElementById('stars-canvas'); const ctx = c.getContext('2d');
-  const resize = () => { c.width = window.innerWidth; c.height = window.innerHeight; ctx.clearRect(0,0,c.width, c.height); for (let i = 0; i < 70; i++) { ctx.beginPath(); ctx.arc(Math.random() * c.width, Math.random() * c.height, Math.random() * 1.5, 0, Math.PI * 2); ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.4})`; ctx.fill(); } };
-  window.onresize = resize; resize();
-})();
+function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+    document.getElementById(id).classList.remove('hidden');
+}
 
-document.getElementById('btn-home').onclick = renderHome;
-document.getElementById('btn-retry').onclick = () => startGame(State.cat);
 renderHome();
 </script>
 </body>
