@@ -3,149 +3,59 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="MatekSprint">
-  <meta name="theme-color" content="#0f0f1a">
-  <title>MatekSprint Pro</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <title>MatekSprint Pro - Balanced</title>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Nunito:wght@500;700;800;900&display=swap" rel="stylesheet">
-
   <style>
+    /* ... (A stílusok változatlanok a korábbi mobil-optimalizált verzióból) ... */
+    /* Ide másold be a korábbi <style> blokkot a betűméret-növeléssel együtt */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg:       #0f0f1a;
-      --surface:  #1a1a2e;
-      --surface2: #252540;
-      --text:     #f0f0ff;
-      --text-dim: #8888aa;
-      --c1: #4cc9f0;
-      --c2: #ff9e00;
-      --c3: #06d6a0;
-      --c4: #ff6b9d;
-      --danger: #ff4d6d;
-      --ok:     #06d6a0;
-      --font-ui:  'Nunito', sans-serif;
-      --font-num: 'Space Mono', monospace;
-      --safe-top: env(safe-area-inset-top, 0px);
-      --safe-bot: env(safe-area-inset-bottom, 0px);
-      --accent: #4cc9f0;
-    }
-
-    html, body {
-      height: 100%; width: 100%;
-      overflow: hidden;
-      touch-action: manipulation;
-      -webkit-tap-highlight-color: transparent;
-      font-family: var(--font-ui);
-      background: var(--bg);
-      color: var(--text);
-    }
-
+    :root { --bg: #0f0f1a; --surface: #1a1a2e; --surface2: #252540; --text: #f0f0ff; --text-dim: #8888aa; --c1: #4cc9f0; --c2: #ff9e00; --c3: #06d6a0; --c4: #ff6b9d; --danger: #ff4d6d; --ok: #06d6a0; --font-ui: 'Nunito', sans-serif; --font-num: 'Space Mono', monospace; --safe-top: env(safe-area-inset-top, 0px); --safe-bot: env(safe-area-inset-bottom, 0px); --accent: #4cc9f0; }
+    html, body { height: 100%; width: 100%; overflow: hidden; touch-action: manipulation; -webkit-tap-highlight-color: transparent; font-family: var(--font-ui); background: var(--bg); color: var(--text); }
     .stars-bg { position: fixed; inset: 0; pointer-events: none; z-index: -1; }
-
-    .screen {
-      position: absolute; inset: 0;
-      display: flex; flex-direction: column; align-items: center;
-      padding-top: calc(var(--safe-top) + 12px);
-      padding-bottom: calc(var(--safe-bot) + 12px);
-      padding-left: 16px; padding-right: 16px;
-      transition: opacity .18s ease, transform .18s ease;
-      overflow: hidden;
-    }
+    .screen { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; padding-top: calc(var(--safe-top) + 12px); padding-bottom: calc(var(--safe-bot) + 12px); padding-left: 16px; padding-right: 16px; transition: opacity .18s ease, transform .18s ease; overflow: hidden; }
     .screen.hidden { opacity: 0; pointer-events: none; transform: scale(.96); }
-
-    /* --- HOME --- */
     #home { justify-content: flex-start; overflow-y: auto; }
     .home-header { width: 100%; text-align: center; padding: 24px 0 32px; flex-shrink: 0; }
-    .logo {
-      font-family: var(--font-num);
-      font-size: clamp(34px, 10vw, 44px); font-weight: 700; letter-spacing: -1px;
-      background: linear-gradient(135deg, #4cc9f0, #ff6b9d);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    }
+    .logo { font-family: var(--font-num); font-size: clamp(34px, 10vw, 44px); font-weight: 700; letter-spacing: -1px; background: linear-gradient(135deg, #4cc9f0, #ff6b9d); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
     .logo-sub { font-size: 15px; color: var(--text-dim); margin-top: 6px; letter-spacing: 1px; text-transform: uppercase; font-weight: 700; }
-
     .categories { width: 100%; display: flex; flex-direction: column; gap: 16px; padding-bottom: 60px; max-width: 500px; }
-    
-    .cat-btn {
-      --c: var(--c1);
-      background: var(--surface);
-      border: 2px solid color-mix(in srgb, var(--c) 40%, transparent);
-      border-radius: 24px; padding: 22px 16px; cursor: pointer;
-      display: flex; flex-direction: column; align-items: center; gap: 8px;
-      transition: transform .12s, background .2s; -webkit-user-select: none; user-select: none;
-      position: relative; overflow: hidden;
-    }
-    .cat-btn::before {
-      content: ''; position: absolute; inset: 0;
-      background: radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--c) 18%, transparent), transparent 75%);
-    }
+    .cat-btn { --c: var(--c1); background: var(--surface); border: 2px solid color-mix(in srgb, var(--c) 40%, transparent); border-radius: 24px; padding: 22px 16px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px; transition: transform .12s, background .2s; -webkit-user-select: none; user-select: none; position: relative; overflow: hidden; }
+    .cat-btn::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--c) 18%, transparent), transparent 75%); }
     .cat-btn:active { transform: scale(.96); background: var(--surface2); }
-    
     .cat-name { font-size: 18px; font-weight: 900; text-align: center; color: var(--text); line-height: 1.2; text-transform: uppercase; letter-spacing: 0.5px; }
-    .cat-hs   { font-family: var(--font-num); font-size: 13px; color: var(--text-dim); margin-top: 4px; }
+    .cat-hs { font-family: var(--font-num); font-size: 13px; color: var(--text-dim); margin-top: 4px; }
     .cat-hs b { color: var(--c); font-weight: 700; }
-
-    /* --- GAME --- */
     #game { justify-content: space-between; gap: 8px; }
     .game-topbar { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 6px 4px; }
-    .score-num   { font-family: var(--font-num); font-size: 36px; font-weight: 700; color: var(--text); line-height: 1; transition: transform .1s; }
+    .score-num { font-family: var(--font-num); font-size: 36px; font-weight: 700; color: var(--text); line-height: 1; transition: transform .1s; }
     .score-num.bump { transform: scale(1.3); color: var(--ok); }
-    .timer-num   { font-family: var(--font-num); font-size: 44px; font-weight: 700; color: var(--text); line-height: 1; }
+    .timer-num { font-family: var(--font-num); font-size: 44px; font-weight: 700; color: var(--text); line-height: 1; }
     .timer-num.danger { color: var(--danger); animation: shake 0.5s infinite; }
-    
     @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-2px); } 75% { transform: translateX(2px); } }
-
-    .progress-bar  { width: 100%; height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
+    .progress-bar { width: 100%; height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
     .progress-fill { height: 100%; width: 100%; background: var(--accent); transition: width 1.05s linear; }
-
     .task-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; width: 100%; position: relative; }
-    .task-eq   { font-family: var(--font-num); font-size: clamp(36px, 12vw, 56px); font-weight: 700; color: var(--text); text-align: center; }
-
-    #level-up-pop {
-      position: absolute; top: 20%; font-weight: 900; font-size: 28px; color: #ffd60a;
-      text-shadow: 0 0 15px rgba(255,214,10,0.5); pointer-events: none; opacity: 0;
-      transform: translateY(20px); transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
+    .task-eq { font-family: var(--font-num); font-size: clamp(36px, 12vw, 56px); font-weight: 700; color: var(--text); text-align: center; }
+    #level-up-pop { position: absolute; top: 20%; font-weight: 900; font-size: 28px; color: #ffd60a; text-shadow: 0 0 15px rgba(255,214,10,0.5); pointer-events: none; opacity: 0; transform: translateY(20px); transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     #level-up-pop.show { opacity: 1; transform: translateY(0); }
-
-    .answer-box {
-      font-family: var(--font-num); font-size: 46px; font-weight: 700; color: var(--accent);
-      min-width: 180px; min-height: 80px; background: var(--surface);
-      border: 3px solid color-mix(in srgb, var(--accent) 30%, transparent);
-      border-radius: 20px; display: flex; align-items: center; justify-content: center;
-    }
+    .answer-box { font-family: var(--font-num); font-size: 46px; font-weight: 700; color: var(--accent); min-width: 180px; min-height: 80px; background: var(--surface); border: 3px solid color-mix(in srgb, var(--accent) 30%, transparent); border-radius: 20px; display: flex; align-items: center; justify-content: center; }
     .answer-box.has-input { border-color: var(--accent); }
     .cursor { display: inline-block; width: 3px; height: 1em; background: var(--accent); margin-left: 4px; animation: blink .8s step-end infinite; }
     @keyframes blink { 50% { opacity: 0; } }
-
-    /* --- KEYBOARD --- */
     .keyboard { width: 100%; max-width: 360px; padding-bottom: 8px; }
-    .kb-grid  { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-    .kb-btn {
-      font-family: var(--font-num); font-size: 26px; font-weight: 700;
-      background: var(--surface); border: 2px solid var(--surface2);
-      border-radius: 16px; color: var(--text); cursor: pointer;
-      aspect-ratio: 1.4; display: flex; align-items: center; justify-content: center;
-      transition: background .1s, transform .1s; -webkit-user-select: none;
-    }
+    .kb-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .kb-btn { font-family: var(--font-num); font-size: 26px; font-weight: 700; background: var(--surface); border: 2px solid var(--surface2); border-radius: 16px; color: var(--text); cursor: pointer; aspect-ratio: 1.4; display: flex; align-items: center; justify-content: center; transition: background .1s, transform .1s; -webkit-user-select: none; }
     .kb-btn:active { background: var(--surface2); transform: scale(0.92); }
-    .kb-btn.kb-ok  { background: var(--accent); border-color: var(--accent); color: #fff; }
-
-    /* --- RESULT --- */
+    .kb-btn.kb-ok { background: var(--accent); border-color: var(--accent); color: #fff; }
     #result { justify-content: flex-start; overflow-y: auto; }
-    .result-num   { font-family: var(--font-num); font-size: 80px; font-weight: 700; color: var(--accent); line-height: 1; }
+    .result-num { font-family: var(--font-num); font-size: 80px; font-weight: 700; color: var(--accent); line-height: 1; }
     .result-hs-wrap { background: var(--surface); border-radius: 24px; padding: 20px; width: 100%; max-width: 320px; margin-top: 10px; }
     .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; border-top: 1px solid var(--surface2); padding-top: 12px; }
     .stat-box { font-size: 14px; color: var(--text-dim); }
     .stat-box b { display: block; color: var(--text); font-size: 18px; font-family: var(--font-num); }
-
     .history-list { display: flex; flex-direction: column; gap: 10px; width: 100%; margin-top: 20px; }
     .history-item { display: flex; align-items: center; background: var(--surface); padding: 14px; border-radius: 14px; border-left: 5px solid var(--danger); gap: 12px; font-size: 15px; }
     .history-item.correct { border-left-color: var(--ok); }
-    
     .btn-primary { width: 100%; max-width: 320px; padding: 20px; border-radius: 20px; background: var(--accent); color: #fff; font-weight: 800; border: none; font-size: 20px; cursor: pointer; }
   </style>
 </head>
@@ -201,27 +111,33 @@
 
 <script>
 /**
- * MatekSprint Pro - Engine with Recent Task Buffer
+ * MatekSprint Pro - Balanced Edition
  */
 
 const CATS = {
-  szorzas: { id: 'szorzas', name:'Szorzótábla', color:'#4cc9f0', bonusTime: 2000, 
+  szorzas: { id: 'szorzas', name:'Szorzótábla', color:'#4cc9f0', bBase: 1800, bInc: 200, 
     gen: (l) => { const a=rand(2, 5+l*2), b=rand(2, 9); return {q:`${a} × ${b}`, a:(a*b).toString(), k:`${a}x${b}`} } },
-  osztas: { id: 'osztas', name:'Osztás', color:'#ff9e00', bonusTime: 3500,
+  osztas: { id: 'osztas', name:'Osztás', color:'#ff9e00', bBase: 2500, bInc: 300,
     gen: (l) => { const b=rand(2, 6+l), c=rand(2, 8+l); return {q:`${b*c} ÷ ${b}`, a:c.toString(), k:`${b*c}d${b}`} } },
-  tszorz: { id: 'tszorz', name:'Tizedes szorzás', color:'#06d6a0', bonusTime: 3000,
-    gen: (l) => { const m=[10,100,1000][Math.min(2, rand(0, l-1))]; const v=rand(11,99)/10; return {q:`${v} × ${m}`, a:fmt(v*m), k:`${v}x${m}`} } },
-  toszt: { id: 'toszt', name:'Tizedes osztás', color:'#ff6b9d', bonusTime: 4000,
+  tszorz: { id: 'tszorz', name:'Tizedes szorzás', color:'#06d6a0', bBase: 3500, bInc: 400,
+    gen: (l) => {
+      let a, b;
+      if (l <= 1) { a = rand(2, 9) / 10; b = rand(2, 9); }
+      else if (l === 2) { const m = [10, 100][rand(0, 1)]; a = rand(11, 999) / 10; b = m; }
+      else { a = rand(2, 12) / 10; b = rand(2, 5) / 10; }
+      return { q: `${fmt(a)} × ${fmt(b)}`, a: fmt(a * b), k: `${a}x${b}` };
+    } 
+  },
+  toszt: { id: 'toszt', name:'Tizedes osztás', color:'#ff6b9d', bBase: 4500, bInc: 500,
     gen: (l) => { const c=rand(1,30+(l*10)), b=rand(2,5); return {q:`${fmt(c*b/10)} ÷ ${b}`, a:fmt(c/10), k:`${c}d${b}`} } },
-  tort: { id: 'tort', name:'Törtek', color:'#ffd166', bonusTime: 4500,
+  tort: { id: 'tort', name:'Törtek', color:'#ffd166', bBase: 5500, bInc: 200,
     gen: (l) => { const d=[2,4,5,8,10,20,25][Math.min(6, l)]; const n=rand(1,d-1); return {q:`${n} / ${d}`, a:fmt(n/d), k:`${n}/${d}`} } }
 };
 
 let State = {
   cat: null, score: 0, time: 60, timerInterval: null, task: null,
   input: '', history: [], mistakes: [], level: 1, streak: 0,
-  startTime: 0, isInputLocked: false,
-  recentTasks: [] // FIFO Buffer for anti-duplication
+  startTime: 0, isInputLocked: false, recentTasks: []
 };
 
 const rand = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
@@ -240,10 +156,7 @@ function renderHome() {
     const btn = document.createElement('div');
     btn.className = 'cat-btn';
     btn.style.setProperty('--c', cat.color);
-    btn.innerHTML = `
-      <div class="cat-name">${cat.name}</div>
-      <div class="cat-hs">Rekord: <b>${stats.hs}</b> | Átl: <b>${stats.avgT}ms</b></div>
-    `;
+    btn.innerHTML = `<div class="cat-name">${cat.name}</div><div class="cat-hs">Rekord: <b>${stats.hs}</b> | Átl: <b>${stats.avgT}ms</b></div>`;
     btn.onclick = () => startGame(cat.id);
     container.appendChild(btn);
   });
@@ -252,13 +165,7 @@ function renderHome() {
 
 function startGame(id) {
   if (State.timerInterval) clearInterval(State.timerInterval);
-  State = {
-    cat: id, score: 0, time: 60, timerInterval: null, task: null,
-    input: '', history: [], mistakes: [], level: 1, streak: 0,
-    startTime: 0, isInputLocked: false,
-    recentTasks: []
-  };
-
+  State = { cat: id, score: 0, time: 60, timerInterval: null, task: null, input: '', history: [], mistakes: [], level: 1, streak: 0, startTime: 0, isInputLocked: false, recentTasks: [] };
   const catCfg = CATS[id];
   document.documentElement.style.setProperty('--accent', catCfg.color);
   document.getElementById('cat-badge').textContent = catCfg.name;
@@ -266,11 +173,9 @@ function startGame(id) {
   document.getElementById('timer-num').textContent = '60';
   document.getElementById('timer-num').classList.remove('danger');
   document.getElementById('progress-fill').style.width = '100%';
-  
   rebuildKeyboard(id !== 'szorzas' && id !== 'osztas');
   nextTask();
   showScreen('game');
-
   State.timerInterval = setInterval(() => {
     State.time--;
     const timerEl = document.getElementById('timer-num');
@@ -282,43 +187,24 @@ function startGame(id) {
 }
 
 function nextTask() {
-  State.input = '';
-  State.isInputLocked = false;
+  State.input = ''; State.isInputLocked = false;
   document.getElementById('answer-text').textContent = '';
   document.getElementById('answer-box').classList.remove('has-input');
-
   let selectedTask = null;
-
-  // 1. Check for mistakes first (30% chance)
-  if (State.mistakes.length > 0 && Math.random() < 0.3) {
+  if (State.mistakes.length > 0 && Math.random() < 0.25) { // Csökkentett hiba-esély a jobb flow érdekében
     selectedTask = State.mistakes[rand(0, State.mistakes.length - 1)];
   } else {
-    // 2. Generate new unique task using Buffer
     let attempts = 0;
-    while (attempts < 10) {
+    while (attempts < 12) {
       const t = CATS[State.cat].gen(State.level);
-      const potentialTask = { q: t.q, a: t.a, k: t.k };
-      
-      // Check if it was recently shown
-      if (!State.recentTasks.includes(potentialTask.k)) {
-        selectedTask = potentialTask;
-        break;
-      }
+      if (!State.recentTasks.includes(t.k)) { selectedTask = t; break; }
       attempts++;
     }
-    // Fallback if no unique found in 10 tries
-    if (!selectedTask) {
-      const t = CATS[State.cat].gen(State.level);
-      selectedTask = { q: t.q, a: t.a, k: t.k };
-    }
+    if (!selectedTask) selectedTask = CATS[State.cat].gen(State.level);
   }
-
   State.task = selectedTask;
-  
-  // Add to Buffer and maintain size (max 6 to prevent lockout on low levels)
   State.recentTasks.push(selectedTask.k);
-  if (State.recentTasks.length > 6) State.recentTasks.shift();
-
+  if (State.recentTasks.length > 8) State.recentTasks.shift();
   document.getElementById('task-eq').textContent = `${State.task.q} = ?`;
   State.startTime = performance.now();
 }
@@ -329,24 +215,24 @@ function submit() {
   const rt = performance.now() - State.startTime;
   const isCorrect = fmt(parseFloat(State.input.replace(',', '.'))) === State.task.a;
   State.history.push({ q: State.task.q, ua: State.input, ca: State.task.a, ok: isCorrect, rt });
-
   if (isCorrect) {
     State.streak++;
+    const cat = CATS[State.cat];
+    const dynamicBonus = cat.bBase + (State.level * cat.bInc);
     let points = 1;
-    if (rt < CATS[State.cat].bonusTime) points++;
+    if (rt < dynamicBonus) points++;
     if (State.level > 3) points++;
     State.score += points;
     if (State.streak >= 5 && State.level < 5) { State.level++; State.streak = 0; showLevelUp(); }
     const el = document.getElementById('score-num');
-    el.textContent = State.score;
-    el.classList.add('bump'); 
+    el.textContent = State.score; el.classList.add('bump');
     setTimeout(() => el.classList.remove('bump'), 200);
   } else {
     State.streak = 0;
     if (!State.mistakes.find(m => m.k === State.task.k)) State.mistakes.push(State.task);
     if (State.level > 1) State.level--;
   }
-  nextTask();
+  setTimeout(nextTask, 150); // Kis szünet a válasz után
 }
 
 function showLevelUp() {
@@ -363,26 +249,11 @@ function endGame() {
   const correct = State.history.filter(h => h.ok).length;
   const acc = total ? Math.round((correct / total) * 100) : 0;
   const avg = total ? Math.round(State.history.reduce((s, h) => s + h.rt, 0) / total) : 0;
-  const isNewHs = State.score > stats.hs;
-  
-  localStorage.setItem('stats_' + State.cat, JSON.stringify({
-    hs: Math.max(stats.hs, State.score),
-    avgT: stats.plays === 0 ? avg : Math.round((stats.avgT + avg) / 2),
-    acc: stats.plays === 0 ? acc : Math.round((stats.acc + acc) / 2),
-    plays: (stats.plays || 0) + 1
-  }));
-
+  localStorage.setItem('stats_' + State.cat, JSON.stringify({ hs: Math.max(stats.hs, State.score), avgT: stats.plays === 0 ? avg : Math.round((stats.avgT + avg) / 2), acc: stats.plays === 0 ? acc : Math.round((stats.acc + acc) / 2), plays: (stats.plays || 0) + 1 }));
   document.getElementById('result-num').textContent = State.score;
-  document.getElementById('new-record').style.display = isNewHs ? 'block' : 'none';
   document.getElementById('res-acc').textContent = acc + '%';
   document.getElementById('res-time').textContent = avg + 'ms';
   document.getElementById('res-level').textContent = State.level;
-  
-  let starStr = '⭐';
-  if (acc > 50) starStr = '⭐⭐';
-  if (acc > 85 && State.score > 10) starStr = '⭐⭐⭐';
-  document.getElementById('result-stars').textContent = starStr;
-  
   renderHistory();
   showScreen('result');
 }
@@ -393,7 +264,7 @@ function renderHistory() {
   [...State.history].reverse().slice(0, 10).forEach(h => {
     const item = document.createElement('div');
     item.className = `history-item ${h.ok ? 'correct' : ''}`;
-    item.innerHTML = `<div style="flex:1">${h.q} = <b>${h.ua}</b> ${!h.ok ? `<span style="color:var(--text-dim); font-size: 0.9em;"> (helyes: ${h.ca})</span>` : ''}</div><div style="font-size:11px; opacity:0.6; font-family: var(--font-num);">${Math.round(h.rt)}ms</div>`;
+    item.innerHTML = `<div style="flex:1">${h.q} = <b>${h.ua}</b> ${!h.ok ? `<span style="color:var(--text-dim); font-size: 0.9em;"> (${h.ca})</span>` : ''}</div><div style="font-size:11px; opacity:0.6;">${Math.round(h.rt)}ms</div>`;
     container.appendChild(item);
   });
 }
@@ -402,10 +273,7 @@ function handleKey(v) {
   if (State.isInputLocked) return;
   if (v === 'OK') submit();
   else if (v === 'DEL') State.input = State.input.slice(0, -1);
-  else {
-    if ((v === '.' || v === ',') && (State.input.includes('.') || State.input.includes(','))) return;
-    if (State.input.length < 8) State.input += v;
-  }
+  else { if ((v === '.' || v === ',') && (State.input.includes('.') || State.input.includes(','))) return; if (State.input.length < 8) State.input += v; }
   document.getElementById('answer-text').textContent = State.input.replace('.', ',');
   document.getElementById('answer-box').classList.toggle('has-input', State.input.length > 0);
 }
@@ -413,35 +281,23 @@ function handleKey(v) {
 function rebuildKeyboard(showDot) {
   const grid = document.getElementById('kb-grid');
   grid.innerHTML = '';
-  [1, 2, 3, 4, 5, 6, 7, 8, 9].forEach(n => {
-    const b = document.createElement('button'); b.className = 'kb-btn'; b.textContent = n;
-    b.onclick = () => handleKey(n.toString()); grid.appendChild(b);
+  [1, 2, 3, 4, 5, 6, 7, 8, 9, 'DEL', 0, showDot ? ',' : 'OK'].forEach(v => {
+    const b = document.createElement('button'); b.className = 'kb-btn' + (v === 'OK' ? ' kb-ok' : '');
+    b.textContent = v === 'DEL' ? '⌫' : v;
+    b.onclick = () => handleKey(v === ',' ? '.' : v);
+    grid.appendChild(b);
   });
-  const del = document.createElement('button'); del.className = 'kb-btn'; del.textContent = '⌫'; del.onclick = () => handleKey('DEL'); grid.appendChild(del);
-  const zero = document.createElement('button'); zero.className = 'kb-btn'; zero.textContent = '0'; zero.onclick = () => handleKey('0'); grid.appendChild(zero);
   if (showDot) {
-    const dot = document.createElement('button'); dot.className = 'kb-btn'; dot.textContent = ','; dot.onclick = () => handleKey('.'); grid.appendChild(dot);
+    const ok = document.createElement('button'); ok.className = 'kb-btn kb-ok'; ok.style.gridColumn = 'span 3'; ok.textContent = 'OK';
+    ok.onclick = () => handleKey('OK'); grid.appendChild(ok);
   }
-  const ok = document.createElement('button'); ok.className = 'kb-btn kb-ok'; ok.style.gridColumn = showDot ? 'span 3' : 'span 1'; ok.textContent = 'OK'; ok.onclick = () => handleKey('OK'); grid.appendChild(ok);
 }
 
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-  const target = document.getElementById(id);
-  if (target) { target.classList.remove('hidden'); target.scrollTop = 0; }
-}
+function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden')); const target = document.getElementById(id); if (target) { target.classList.remove('hidden'); target.scrollTop = 0; } }
 
 (function initStars() {
-  const c = document.getElementById('stars-canvas');
-  const ctx = c.getContext('2d');
-  const resize = () => {
-    c.width = window.innerWidth; c.height = window.innerHeight;
-    ctx.clearRect(0,0,c.width, c.height);
-    for (let i = 0; i < 70; i++) {
-      ctx.beginPath(); ctx.arc(Math.random() * c.width, Math.random() * c.height, Math.random() * 1.5, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.4})`; ctx.fill();
-    }
-  };
+  const c = document.getElementById('stars-canvas'); const ctx = c.getContext('2d');
+  const resize = () => { c.width = window.innerWidth; c.height = window.innerHeight; ctx.clearRect(0,0,c.width, c.height); for (let i = 0; i < 70; i++) { ctx.beginPath(); ctx.arc(Math.random() * c.width, Math.random() * c.height, Math.random() * 1.5, 0, Math.PI * 2); ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.4})`; ctx.fill(); } };
   window.onresize = resize; resize();
 })();
 
