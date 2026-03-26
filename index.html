@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>MatekSprint Pro - Stats Restored</title>
+  <title>MatekSprint Pro - Optimized Edition</title>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Nunito:wght@500;700;800;900&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -16,265 +16,363 @@
       --font-num: 'Space Mono', monospace; 
       --safe-top: env(safe-area-inset-top, 20px); 
       --safe-bot: env(safe-area-inset-bottom, 20px); 
-      --accent: #4cc9f0; 
+      --accent: #4cc9f0;
     }
-    
     html, body { height: 100dvh; width: 100vw; overflow: hidden; position: fixed; background: var(--bg); color: var(--text); font-family: var(--font-ui); touch-action: manipulation; }
     .stars-bg { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
     .screen { position: absolute; inset: 0; display: flex; flex-direction: column; padding: var(--safe-top) 16px var(--safe-bot); transition: opacity .18s ease; }
     .scroll-content { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; width: 100%; -webkit-overflow-scrolling: touch; padding-bottom: 40px; }
-    .hidden { opacity: 0; pointer-events: none; display: none; }
-
-    /* UI Elemet */
+    .hidden { opacity: 0; pointer-events: none; display: none !important; }
     .task-eq { font-family: var(--font-num); font-size: clamp(22px, 6vw, 38px); text-align: center; margin: 15px 0; min-height: 80px; display: flex; align-items: center; justify-content: center; width: 100%; }
     .task-eq.word-problem { font-family: var(--font-ui); font-size: 19px; line-height: 1.4; font-weight: 500; padding: 0 10px; }
-    .task-eq.target-problem { color: var(--c3); font-weight: 800; border: 2px dashed var(--c3); border-radius: 15px; padding: 10px; }
-
-    #visual-container { display: none; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 10px; }
-    #visual-canvas { width: 200px; height: 200px; background: var(--surface2); border-radius: 12px; border: 3px solid var(--surface2); }
-    
     .answer-box { font-family: var(--font-num); font-size: 36px; color: var(--accent); min-height: 75px; width: 100%; max-width: 300px; background: var(--surface); border-radius: 18px; display: flex; align-items: center; justify-content: center; border: 3px solid var(--surface2); }
     .cursor { width: 3px; height: 30px; background: var(--accent); margin-left: 8px; animation: blink 0.8s infinite; }
     @keyframes blink { 50% { opacity: 0; } }
-
-    /* Statisztika Kártyák */
     .stats-card { background: var(--surface2); width: 100%; max-width: 350px; border-radius: 15px; padding: 15px; margin-top: 25px; border: 1px solid rgba(255,255,255,0.1); }
     .history-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
-
-    /* Keyboard */
     .keyboard { width: 100%; max-width: 400px; margin: 0 auto; flex-shrink: 0; padding-top: 10px; }
-    .kb-grid { display: grid; gap: 8px; }
-    .kb-btn { font-family: var(--font-num); font-size: 24px; font-weight: 700; background: var(--surface); border: 1px solid var(--surface2); border-radius: 14px; color: var(--text); height: clamp(48px, 7dvh, 60px); display: flex; align-items: center; justify-content: center; }
+    .kb-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .kb-btn { font-family: var(--font-num); font-size: 24px; font-weight: 700; background: var(--surface); border: 1px solid var(--surface2); border-radius: 14px; color: var(--text); height: clamp(48px, 7dvh, 60px); display: flex; align-items: center; justify-content: center; cursor: pointer; -webkit-tap-highlight-color: transparent; outline: none; transition: background 0.1s; }
     .kb-btn:active { background: var(--surface2); transform: scale(0.96); }
-    .kb-ok { background: var(--accent); color: #fff; grid-column: span 3; font-weight: 900; height: 65px !important; margin-top: 4px; box-shadow: 0 4px 0 color-mix(in srgb, var(--accent) 70%, black); }
-    
-    .cat-btn { background: var(--surface); padding: 18px; border-radius: 18px; text-align: center; font-weight: 800; border: 2px solid transparent; transition: all 0.2s; }
+    .kb-ok { background: var(--accent); color: #fff; grid-column: span 3; font-weight: 900; height: 65px !important; margin-top: 4px; box-shadow: 0 4px 0 color-mix(in srgb, var(--accent) 70%, black); border: none; }
+    .cat-btn { background: var(--surface); padding: 18px; border-radius: 18px; text-align: center; font-weight: 800; border: 2px solid transparent; transition: all 0.2s; cursor: pointer; width: 100%; color: var(--text); }
+    .cat-btn:active { transform: scale(0.98); background: var(--surface2); }
     #tip-pop { position: fixed; top: 20%; left: 50%; transform: translateX(-50%); background: var(--surface2); border: 2px solid var(--accent); padding: 15px; border-radius: 15px; z-index: 100; display: none; text-align: center; width: 80%; }
   </style>
 </head>
-<body ontouchstart="">
+<body>
 <canvas class="stars-bg" id="stars-canvas"></canvas>
 <div id="tip-pop"><span id="tip-text"></span></div>
 
-<div class="screen" id="home">
+<main class="screen" id="home">
   <div class="scroll-content">
     <h1 style="margin: 40px 0 5px; font-family: var(--font-num); font-size: 38px; text-align: center; color: var(--c1);">MatekSprint</h1>
-    <p style="color: var(--text-dim); margin-bottom: 25px; text-align: center;">5. osztályos fejlesztő</p>
-    
+    <p style="color: var(--text-dim); margin-bottom: 25px; text-align: center;">Középiskolai előkészítő</p>
     <div id="cat-list" style="width: 100%; max-width: 350px; display: flex; flex-direction: column; gap: 12px;"></div>
-
     <div class="stats-card">
       <h3 style="color: var(--c5); font-size: 16px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">📊 Sprint Történelem</h3>
       <div id="stats-total" style="font-size: 13px; color: var(--text-dim); margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--surface);"></div>
       <div id="history-recent"></div>
     </div>
   </div>
-</div>
+</main>
 
-<div class="screen hidden" id="game">
+<section class="screen hidden" id="game">
   <div class="scroll-content">
     <div style="display: flex; justify-content: space-between; width: 100%; font-family: var(--font-num); font-size: 24px; padding: 5px 10px;">
       <span id="score-num">0</span> <span id="timer-num">60</span>
     </div>
     <div id="task-eq" class="task-eq"></div>
-    <div id="visual-container">
-      <span style="font-size: 11px; font-weight: 800; color: var(--accent);">10 × 10 RÁCS</span>
-      <canvas id="visual-canvas" width="200" height="200"></canvas>
-    </div>
     <div class="answer-box"><span id="answer-text"></span><span class="cursor"></span></div>
   </div>
-  <div class="keyboard"><div class="kb-grid" id="kb-grid"></div><button class="kb-btn kb-ok" onclick="submit()">BEKÜLDÉS</button></div>
-</div>
+  <div class="keyboard">
+    <div class="kb-grid" id="kb-grid"></div>
+    <button type="button" class="kb-btn kb-ok" onclick="submitAnswer()">BEKÜLDÉS</button>
+  </div>
+</section>
 
-<div class="screen hidden" id="result">
+<section class="screen hidden" id="result">
   <div class="scroll-content">
     <h2 style="font-size: 60px; color: var(--accent); margin-top: 40px;" id="result-num">0</h2>
-    <p id="res-stats" style="margin-bottom: 20px; font-weight: 700;"></p>
-    <button class="kb-btn kb-ok" style="max-width: 300px;" onclick="location.reload()">VISSZA A MENÜBE</button>
+    <div id="res-stats" style="margin-bottom: 20px; font-weight: 700; text-align: center; line-height: 1.6;"></div>
+    <button type="button" class="kb-btn kb-ok" style="max-width: 300px;" onclick="resetToHome()">VISSZA A MENÜBE</button>
     <div id="history-list" style="width: 100%; margin-top: 20px;"></div>
   </div>
-</div>
+</section>
 
 <script>
-// --- ADATOK ÉS TÁROLÁS ---
 const CATS = {
-  szorzas: { id: 'szorzas', name:'Szorzótábla', color:'#4cc9f0', gen: (l) => { const a=rand(2, 5+l*2), b=rand(2, 9); return {q:`${a} × ${b}`, a:(a*b).toString()} } },
-  osztas: { id: 'osztas', name:'Osztás', color:'#ff9e00', gen: (l) => { const b=rand(2, 6+l), c=rand(2, 8+l); return {q:`${b*c} ÷ ${b}`, a:c.toString()} } },
-  tszorz: { id: 'tszorz', name:'Tizedes szorzás', color:'#06d6a0', gen: (l) => { const a=rand(2, 9)/10, b=rand(2, 9); return {q:`${f(a)} × ${b}`, a:f(a*b)} } },
-  toszt: { id: 'toszt', name:'Tizedes osztás', color:'#ff6b9d', gen: (l) => { const c=rand(1, 30+(l*5)), b=rand(2, 5); return {q:`${f(c*b/10)} ÷ ${b}`, a:f(c/10)} } },
-  tort: { id: 'tort', name:'Törtek', color:'#ffd166', gen: (l) => { const d=[2,4,5,8,10,20,25,50][Math.min(7, l)]; const n=rand(1,d-1); return {q:`${n} / ${d}`, a:f(n/d)} } }
+  szorzas: { id: 'szorzas', name:'Szorzótábla', color:'#4cc9f0', 
+    gen: (l) => { const a=rand(2, 5+l*2), b=rand(2, 9); return {q:`${a} × ${b}`, a:(a*b).toString()} } },
+  osztas: { id: 'osztas', name:'Osztás', color:'#ff9e00', 
+    gen: (l) => { const b=rand(2, 6+l), c=rand(2, 8+l); return {q:`${b*c} ÷ ${b}`, a:c.toString()} } },
+  tszorz: { id: 'tszorz', name:'Tizedes szorzás', color:'#06d6a0', 
+    gen: (l) => {
+      let a, b;
+      if (l <= 1) { a = rand(2, 9) / 10; b = rand(2, 9); }
+      else if (l === 2) { b = [10, 100][rand(0, 1)]; a = rand(11, 999) / 10; }
+      else { a = rand(2, 12) / 10; b = rand(2, 5) / 10; }
+      return { q: `${f(a)} × ${f(b)}`, a: f(a * b) };
+    } 
+  },
+  toszt: { id: 'toszt', name:'Tizedes osztás', color:'#ff6b9d', 
+    gen: (l) => { const c=rand(1, 30+(l*5)), b=rand(2, 5); return {q:`${f(c*b/10)} ÷ ${b}`, a:f(c/10)} } },
+  tort: { id: 'tort', name:'Törtek', color:'#ffd166', 
+    gen: (l) => { const d=[2,4,5,8,10,20,25,50][Math.min(7, l)]; const n=rand(1,d-1); return {q:`${n} / ${d}`, a:f(n/d)} } }
 };
 
 const WORD_TEMPLATES = [
-  { gen: () => ({ q: `Egy sütihez 0,3 kg liszt kell. Mennyi kell 3 sütihez?`, a: "0,9" }) },
-  { gen: () => ({ q: `Reggel 18,5 °C volt, délutánra nőtt 1,2 °C-ot. Hány fok van?`, a: "19,7" }) },
-  { gen: () => ({ q: `Egy 4,8 méteres kötelet kettévágtunk. Hány méter egy darab?`, a: "2,4" }) },
-  { gen: () => ({ q: `Volt 5000 Ft-od, elköltöttél 1250,5 Ft-ot. Mennyi maradt?`, a: "3749,5" }) }
+  { gen: () => { const b = rand(2, 5)/10; return { q: `Egy sütihez ${f(b)} kg liszt kell. Mennyi kell 3 sütihez?`, a: f(b*3) } } },
+  { gen: () => { const t = rand(15, 25)+0.5, r = rand(2, 8)/10; return { q: `Reggel ${f(t)} °C volt, délutánra nőtt ${f(r)} °C-ot. Hány fok van?`, a: f(t+r) } } },
+  { gen: () => { const l = rand(10, 50)/10; return { q: `Egy ${f(l)} méteres kötelet kettévágtunk. Hány méter egy darab?`, a: f(l/2) } } }
 ];
 
-let State = { cat: null, score: 0, time: 60, input: '', task: null, history: [], level: 1, totalSolved: 0 };
+let state = {
+  cat: null,
+  score: 0,
+  time: 60,
+  input: '',
+  task: null,
+  history: [],
+  level: 1,
+  startTime: 0,
+  gameInterval: null,
+  isSubmitting: false
+};
+
 const rand = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
-const f = (n) => parseFloat(Number(n).toPrecision(12)).toString().replace('.', ',');
 
-// --- LOCALSTORAGE FUNKCIÓK ---
-function saveGameResult() {
-  const history = JSON.parse(localStorage.getItem('mateksprint_history') || '[]');
-  const newRecord = {
-    date: new Date().toLocaleDateString('hu-HU', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}),
-    cat: CATS[State.cat].name,
-    score: State.score
-  };
-  history.unshift(newRecord);
-  localStorage.setItem('mateksprint_history', JSON.stringify(history.slice(0, 5)));
-  localStorage.setItem('mateksprint_total', (parseInt(localStorage.getItem('mateksprint_total') || '0') + State.score));
-}
+const f = (n) => {
+  const rounded = Math.round((n + Number.EPSILON) * 100) / 100;
+  return rounded.toString().replace('.', ',');
+};
 
-function renderStats() {
-  const history = JSON.parse(localStorage.getItem('mateksprint_history') || '[]');
-  const total = localStorage.getItem('mateksprint_total') || '0';
-  
-  document.getElementById('stats-total').textContent = `Összesen megoldott: ${total} feladat`;
-  
-  const container = document.getElementById('history-recent');
-  if (history.length === 0) {
-    container.innerHTML = '<div style="color:var(--text-dim); font-size:12px;">Még nincs lejátszott meccsed.</div>';
-    return;
+function startGame(id) {
+  if (state.gameInterval) {
+    clearInterval(state.gameInterval);
+    state.gameInterval = null;
   }
   
-  container.innerHTML = history.map(h => `
-    <div class="history-item">
-      <span>${h.date} - <b>${h.cat}</b></span>
-      <span style="color:var(--ok); font-weight:800;">${h.score} pts</span>
-    </div>
-  `).join('');
-}
+  state = {
+    cat: id,
+    score: 0,
+    time: 60,
+    input: '',
+    history: [],
+    level: 1,
+    startTime: Date.now(),
+    gameInterval: null,
+    isSubmitting: false,
+    task: null
+  };
 
-// --- JÁTÉK LOGIKA ---
-function startGame(id) {
-  State = { cat: id, score: 0, time: 60, input: '', history: [], level: 1, totalSolved: 0 };
   document.documentElement.style.setProperty('--accent', CATS[id].color);
+  document.getElementById('score-num').textContent = '0';
+  document.getElementById('timer-num').textContent = '60';
+  
   showScreen('game');
   nextTask();
-  const timer = setInterval(() => {
-    State.time--;
-    document.getElementById('timer-num').textContent = State.time;
-    if (State.time <= 0) { 
-      clearInterval(timer); 
-      saveGameResult(); 
-      showScreen('result'); 
-      renderResult(); 
+
+  state.gameInterval = setInterval(() => {
+    state.time--;
+    const timerEl = document.getElementById('timer-num');
+    if (timerEl) timerEl.textContent = state.time;
+    
+    if (state.time <= 0) {
+      clearInterval(state.gameInterval);
+      state.gameInterval = null;
+      finishGame();
     }
   }, 1000);
 }
 
 function nextTask() {
-  State.input = ''; document.getElementById('answer-text').textContent = '';
-  State.totalSolved++;
-  if (State.score > 0 && State.score % 5 === 0) State.level++;
-
-  const roll = Math.random();
-  if (State.totalSolved < 3 && (State.cat === 'tszorz' || State.cat === 'tort')) {
-    const v = rand(10, 90); State.task = { q: "Hányad része színes?", a: f(v/100), isVisual: true, val: v };
-  } else if (State.level >= 3 && State.totalSolved % 6 === 0) {
-    const n1 = rand(2,6), n2 = rand(2,5); const target = n1 * 0.5 + n2;
-    State.task = { q: `Célszám: ${f(target)}`, nums: [n1, n2, "0,5"], a: f(target), isTarget: true };
-  } else if (State.totalSolved % 8 === 0) {
-    State.task = WORD_TEMPLATES[rand(0, WORD_TEMPLATES.length-1)].gen(); State.task.isWord = true;
-  } else {
-    State.task = CATS[State.cat].gen(State.level);
-  }
-
-  const eqEl = document.getElementById('task-eq');
-  eqEl.textContent = State.task.q + (State.task.isVisual || State.task.isTarget || State.task.isWord ? "" : " = ?");
-  eqEl.className = 'task-eq' + (State.task.isWord ? ' word-problem' : '') + (State.task.isTarget ? ' target-problem' : '');
+  state.input = '';
+  state.isSubmitting = false;
+  document.getElementById('answer-text').textContent = '';
+  state.startTime = Date.now();
   
-  document.getElementById('visual-container').style.display = State.task.isVisual ? 'flex' : 'none';
-  if (State.task.isVisual) drawGrid(State.task.val);
-  renderKeyboard();
-}
-
-function drawGrid(filled) {
-  const c = document.getElementById('visual-canvas'), ctx = c.getContext('2d');
-  const s = 20; ctx.clearRect(0,0,200,200);
-  for(let i=0; i<100; i++) {
-    const x=(i%10)*s, y=Math.floor(i/10)*s;
-    ctx.fillStyle = i < filled ? 'var(--accent)' : 'var(--surface2)';
-    ctx.fillRect(x+1, y+1, s-2, s-2);
-    ctx.strokeStyle = '#0f0f1a'; ctx.lineWidth = ((i+1)%5===0) ? 2 : 0.5;
-    ctx.strokeRect(x,y,s,s);
+  if (state.score > 0 && state.score % 5 === 0) {
+    state.level++;
   }
-}
-
-function renderKeyboard() {
-  const grid = document.getElementById('kb-grid'); grid.innerHTML = '';
-  let keys = [1,2,3,4,5,6,7,8,9,',',0,'⌫'];
-  if (State.task.isTarget) {
-    grid.style.gridTemplateColumns = 'repeat(4, 1fr)';
-    keys = [...State.task.nums, '+', '-', '×', '÷', '(', ')', '⌫'];
-  } else {
-    grid.style.gridTemplateColumns = 'repeat(3, 1fr)';
-  }
-  keys.forEach(k => {
-    const b = document.createElement('div'); b.className = 'kb-btn'; b.textContent = k;
-    b.onclick = () => {
-      if (k==='⌫') State.input = State.input.slice(0,-1);
-      else if (State.input.length < 16) State.input += k;
-      document.getElementById('answer-text').textContent = State.input;
-    };
-    grid.appendChild(b);
-  });
-}
-
-function submit() {
-  if (!State.input) return;
-  const clean = (s) => s.replace(/,/g,'.').replace(/×/g,'*').replace(/÷/g,'/');
-  let userVal;
-  try {
-    if (State.task.isTarget) userVal = Function('"use strict";return (' + clean(State.input) + ')')();
-    else userVal = parseFloat(clean(State.input));
-  } catch(e) { return; }
   
-  const correctVal = parseFloat(clean(State.task.a));
-  const isCorrect = Math.abs(userVal - correctVal) < 0.0001;
+  const isWord = Math.random() < 0.15;
+  state.task = isWord ? WORD_TEMPLATES[rand(0, WORD_TEMPLATES.length-1)].gen() : CATS[state.cat].gen(state.level);
+  
+  const el = document.getElementById('task-eq');
+  if (el) {
+    el.textContent = state.task.q;
+    el.className = isWord ? 'task-eq word-problem' : 'task-eq';
+  }
+}
 
-  if (isCorrect) State.score++;
-  else if (Math.abs(userVal - correctVal*10) < 0.01 || Math.abs(userVal - correctVal/10) < 0.01) showTip("Figyelj a tizedesvesszőre!");
-
-  State.history.push({ q: State.task.q, a: State.task.a, ua: State.input, ok: isCorrect });
-  document.getElementById('score-num').textContent = State.score;
+function submitAnswer() {
+  if (!state.input || state.isSubmitting || state.time <= 0) return;
+  
+  state.isSubmitting = true;
+  const ok = state.input === state.task.a;
+  const rt = Date.now() - state.startTime;
+  
+  state.history.push({ q: state.task.q, ua: state.input, a: state.task.a, ok, rt });
+  
+  if (ok) {
+    state.score++;
+    const scoreEl = document.getElementById('score-num');
+    if (scoreEl) scoreEl.textContent = state.score;
+  }
+  
   nextTask();
 }
 
-function showTip(m) { 
-  const p = document.getElementById('tip-pop'); document.getElementById('tip-text').textContent = m;
-  p.style.display='block'; setTimeout(()=>p.style.display='none', 2500);
+function finishGame() {
+  try {
+    const rawHistory = localStorage.getItem('mateksprint_history');
+    const history = rawHistory ? JSON.parse(rawHistory) : [];
+    
+    const newEntry = { 
+      date: new Date().toLocaleDateString('hu-HU', {month:'short', day:'numeric'}), 
+      cat: CATS[state.cat].name, 
+      score: state.score 
+    };
+    
+    history.unshift(newEntry);
+    localStorage.setItem('mateksprint_history', JSON.stringify(history.slice(0, 10)));
+  } catch (e) {
+    console.error("Storage error:", e);
+  }
+  
+  showScreen('result');
+  renderResult();
 }
 
 function renderResult() {
-  document.getElementById('result-num').textContent = State.score;
-  const acc = State.history.length ? Math.round((State.history.filter(h=>h.ok).length/State.history.length)*100) : 0;
-  document.getElementById('res-stats').textContent = `Pontosság: ${acc}% | Szint: ${State.level}`;
-  document.getElementById('history-list').innerHTML = State.history.map(h => `
-    <div style="padding:12px; margin-bottom:8px; border-radius:12px; background:var(--surface); border-left:5px solid ${h.ok?'var(--ok)':'var(--danger)'}">
-      ${h.q} = <b>${h.ua}</b> ${h.ok?'':'<span style="opacity:0.5">('+h.a+')</span>'}
-    </div>
-  `).reverse().join('');
+  const resNum = document.getElementById('result-num');
+  if (resNum) resNum.textContent = state.score;
+
+  const total = state.history.length;
+  const avg = total ? Math.round(state.history.reduce((s, h) => s + h.rt, 0) / total) : 0;
+  const acc = total ? Math.round((state.history.filter(h=>h.ok).length / total) * 100) : 0;
+  
+  const resStats = document.getElementById('res-stats');
+  if (resStats) {
+    resStats.innerHTML = `Pontosság: ${acc}% | Szint: ${state.level}<br><b>Átlagos válaszidő: ${avg}ms</b>`;
+  }
+  
+  const historyList = document.getElementById('history-list');
+  if (historyList) {
+    historyList.innerHTML = state.history.map(h => `
+      <div style="padding:12px; margin-bottom:8px; border-radius:12px; background:var(--surface); border-left:5px solid ${h.ok ? 'var(--ok)' : 'var(--danger)'}; display:flex; justify-content:space-between;">
+        <span>${h.q} = <b>${h.ua}</b></span>
+        <span style="opacity:0.5; font-size:12px;">${Math.round(h.rt)}ms</span>
+      </div>
+    `).reverse().join('');
+  }
 }
 
 function renderHome() {
   const list = document.getElementById('cat-list');
-  list.innerHTML = '';
-  Object.values(CATS).forEach(c => {
-    const b = document.createElement('div'); b.className = 'cat-btn';
-    b.style.borderColor = c.color;
-    b.textContent = c.name; b.onclick = () => startGame(c.id);
-    list.appendChild(b);
-  });
-  renderStats();
+  if (list) {
+    list.innerHTML = '';
+    Object.values(CATS).forEach(c => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'cat-btn';
+      b.textContent = c.name;
+      b.onclick = () => startGame(c.id);
+      list.appendChild(b);
+    });
+  }
+
+  try {
+    const rawHistory = localStorage.getItem('mateksprint_history');
+    const hist = rawHistory ? JSON.parse(rawHistory) : [];
+    const histRecent = document.getElementById('history-recent');
+    if (histRecent) {
+      histRecent.innerHTML = hist.slice(0, 5).map(h => `
+        <div class="history-item">
+          <span>${h.date} - ${h.cat}</span>
+          <b>${h.score} p</b>
+        </div>
+      `).join('');
+    }
+  } catch (e) {
+    const histRecent = document.getElementById('history-recent');
+    if (histRecent) histRecent.innerHTML = '';
+  }
+  
+  showScreen('home');
 }
 
-function showScreen(id) { document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
-renderHome();
+function resetToHome() {
+  if (state.gameInterval) {
+    clearInterval(state.gameInterval);
+    state.gameInterval = null;
+  }
+  renderHome();
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+  const target = document.getElementById(id);
+  if (target) target.classList.remove('hidden');
+}
+
+function handleInput(val) {
+  if (val === '⌫') {
+    state.input = state.input.slice(0, -1);
+  } else if (state.input.length < 8) {
+    if (val === ',' && state.input.includes(',')) return;
+    state.input += val;
+  }
+  const ansText = document.getElementById('answer-text');
+  if (ansText) ansText.textContent = state.input;
+}
+
+// Keyboard init
+const kb = document.getElementById('kb-grid');
+const keys = [1, 2, 3, 4, 5, 6, 7, 8, 9, ',', 0, '⌫'];
+
+keys.forEach(k => {
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'kb-btn';
+  b.textContent = k;
+  b.onclick = (e) => {
+    e.preventDefault();
+    handleInput(k);
+  };
+  kb.appendChild(b);
+});
+
+// Physical keyboard support
+window.addEventListener('keydown', (e) => {
+  const gameScreen = document.getElementById('game');
+  if (gameScreen && !gameScreen.classList.contains('hidden')) {
+    if (e.key >= '0' && e.key <= '9') handleInput(e.key);
+    if (e.key === ',' || e.key === '.') handleInput(',');
+    if (e.key === 'Backspace') handleInput('⌫');
+    if (e.key === 'Enter') submitAnswer();
+  }
+});
+
+// Star background animation
+const canvas = document.getElementById('stars-canvas');
+const ctx = canvas.getContext('2d');
+let stars = [];
+
+function initStars() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  stars = [];
+  for (let i = 0; i < 100; i++) {
+    stars.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      size: Math.random() * 2,
+      speed: Math.random() * 0.5 + 0.2
+    });
+  }
+}
+
+function animateStars() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#ffffff33';
+  stars.forEach(s => {
+    s.y += s.speed;
+    if (s.y > canvas.height) s.y = 0;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+    ctx.fill();
+  });
+  requestAnimationFrame(animateStars);
+}
+
+window.addEventListener('resize', initStars);
+window.addEventListener('DOMContentLoaded', () => {
+  renderHome();
+  initStars();
+  animateStars();
+});
 </script>
 </body>
 </html>
