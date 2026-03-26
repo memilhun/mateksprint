@@ -36,12 +36,9 @@
     .task-eq { font-family: var(--font-num); font-size: clamp(36px, 12vw, 56px); font-weight: 700; color: var(--text); text-align: center; }
     #level-up-pop { position: absolute; top: 15%; font-weight: 900; font-size: 28px; color: #ffd60a; text-shadow: 0 0 15px rgba(255,214,10,0.5); pointer-events: none; opacity: 0; transform: translateY(20px); transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 20; }
     #level-up-pop.show { opacity: 1; transform: translateY(0); }
-    
-    /* Phase 1: Tip Popup Style */
     #tip-pop { position: absolute; bottom: 10%; background: var(--surface2); border: 2px solid var(--accent); padding: 14px 20px; border-radius: 16px; font-size: 14px; color: var(--text); max-width: 85%; text-align: center; opacity: 0; pointer-events: none; transform: translateY(10px); transition: all 0.3s; z-index: 10; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
     #tip-pop.show { opacity: 1; transform: translateY(0); }
     #tip-pop b { color: var(--accent); display: block; margin-bottom: 4px; font-size: 12px; text-transform: uppercase; }
-
     .answer-box { font-family: var(--font-num); font-size: 46px; font-weight: 700; color: var(--accent); min-width: 180px; min-height: 80px; background: var(--surface); border: 3px solid color-mix(in srgb, var(--accent) 30%, transparent); border-radius: 20px; display: flex; align-items: center; justify-content: center; }
     .answer-box.has-input { border-color: var(--accent); }
     .cursor { display: inline-block; width: 3px; height: 1em; background: var(--accent); margin-left: 4px; animation: blink .8s step-end infinite; }
@@ -61,21 +58,7 @@
     .history-item { display: flex; align-items: center; background: var(--surface); padding: 14px; border-radius: 14px; border-left: 5px solid var(--danger); gap: 12px; font-size: 15px; }
     .history-item.correct { border-left-color: var(--ok); }
     .btn-primary { width: 100%; max-width: 320px; padding: 20px; border-radius: 20px; background: var(--accent); color: #fff; font-weight: 800; border: none; font-size: 20px; cursor: pointer; }
-    .task-eq.word-problem {
-      font-size: clamp(18px, 5vw, 24px); /* Kisebb betű a szövegnek */
-      line-height: 1.4;
-      padding: 0 10px;
-      max-width: 90%;
-      font-family: var(--font-ui); /* Szövegesnél olvashatóbb betűtípus */
-    }
-    .hint-text {
-      font-size: 14px;
-      color: var(--c2);
-      margin-top: 8px;
-      font-style: italic;
-      display: none;
-    }
-    .hint-text.show { display: block; }
+    .task-eq.word-problem { font-size: clamp(18px, 5vw, 24px); line-height: 1.4; padding: 0 10px; max-width: 90%; font-family: var(--font-ui); }
   </style>
 </head>
 <body>
@@ -121,39 +104,35 @@
   </div>
   <div class="history-wrap" style="width: 100%; max-width: 400px; padding-bottom: 50px;"><div class="history-list" id="history-list"></div></div>
 </div>
+
 <script>
 /**
- * MatekSprint Pro - Phase 2: Contextual & Interleaved Learning
+ * MatekSprint Pro - Phase 2 & 3 Fixed
  */
 
-// --- SZÖVEGES FELADAT GENERÁTOROK ---
 const WORD_PROBLEM_TEMPLATES = [
-  {
+  { // RECEPT
     gen: () => {
-      const names = ["Anna", "Bence", "Cili", "Dávid"];
-      const items = ["csokit", "matricát", "almát"];
-      const name = names[rand(0, 3)];
-      const item = items[rand(0, 2)];
-      const unit = (rand(1, 5) + 0.5);
-      const qty = rand(2, 4);
+      const baseQty = (rand(2, 5) / 10);
       return {
-        q: `${name} vett ${qty} db ${item}. Egy darab ${fmt(unit)} kg. Mennyi az összsúly?`,
-        a: fmt(unit * qty),
-        hint: "Szorzás: Egységnyi súly × darabszám"
+        q: `Egy sütihez ${fmt(baseQty)} kg liszt kell. Mennyi kell 3 ugyanilyen sütihez?`,
+        a: fmt(baseQty * 3),
+        hint: "Szorzás: Alapanyag × 3"
       };
     }
   },
-  {
+  { // HŐMÉRSÉKLET
     gen: () => {
-      const price = (rand(1, 9) * 100 + 50.5);
+      const temp = rand(15, 25) + 0.5;
+      const rise = rand(2, 5) / 10;
       return {
-        q: `Egy füzet ára ${fmt(price)} Ft. Mennyit fizetünk 2 darabért?`,
-        a: fmt(price * 2),
-        hint: "Szorzás: Ár × 2"
+        q: `Reggel ${fmt(temp)} °C volt, délutánra emelkedett ${fmt(rise)} °C-ot. Hány fok van most?`,
+        a: fmt(temp + rise),
+        hint: "Összeadás: Alaphőmérséklet + emelkedés"
       };
     }
   },
-  {
+  { // KÖTÉL (JAVÍTOTT)
     gen: () => {
       const total = (rand(10, 40) / 10);
       return {
@@ -163,14 +142,14 @@ const WORD_PROBLEM_TEMPLATES = [
       };
     }
   },
-  {
+  { // ZSEBPÉNZ
     gen: () => {
-      const sum = rand(10, 50);
-      const parts = 10;
+      const wallet = rand(10, 20) * 100;
+      const spent = rand(5, 9) * 100 + 0.5;
       return {
-        q: `${sum} szem cukorkát 10 gyerek között osztunk szét. Mennyit kap egy gyerek?`,
-        a: fmt(sum / parts),
-        hint: "Tizedes eltolás: Oszd el a számot 10-zel."
+        q: `Volt ${fmt(wallet)} Ft-od, elköltöttél ${fmt(spent)} Ft-ot. Mennyi maradt?`,
+        a: fmt(wallet - spent),
+        hint: "Kivonás: Eredeti összeg - költés"
       };
     }
   }
@@ -205,9 +184,8 @@ function getStats(id) { try { return JSON.parse(localStorage.getItem('stats_' + 
 function analyzeError(task, userInput, catId) {
   const val = parseFloat(userInput.replace(',', '.'));
   const correct = parseFloat(task.a.replace(',', '.'));
-  if ((catId === 'tszorz' || catId === 'toszt') && (val === correct * 10 || val === correct / 10)) return "Figyelj a tizedeshelyekre! Számold meg a vessző utáni számjegyeket.";
-  if (catId === 'osztas' && val === task.p[0] * task.p[1]) return "Ez a szorzatuk! Osztásnál azt keressük, hányszor fér bele.";
-  if (task.hint) return task.hint; // Ha van beépített hint (szöveges feladat), azt adjuk vissza
+  if ((catId === 'tszorz' || catId === 'toszt') && (val === correct * 10 || val === correct / 10)) return "Figyelj a tizedeshelyekre!";
+  if (task.hint) return task.hint;
   return null;
 }
 
@@ -239,8 +217,8 @@ function startGame(id) {
   document.getElementById('timer-num').textContent = '60';
   document.getElementById('timer-num').classList.remove('danger');
   document.getElementById('progress-fill').style.width = '100%';
-  rebuildKeyboard(id !== 'szorzas' && id !== 'osztas');
-  nextTask(); showScreen('game');
+  nextTask(); 
+  showScreen('game');
   State.timerInterval = setInterval(() => {
     State.time--;
     const timerEl = document.getElementById('timer-num'); timerEl.textContent = State.time;
@@ -260,18 +238,15 @@ function nextTask() {
   let selectedTask = null;
   const lastKey = State.task ? State.task.k : null;
 
-  // INTERLEAVING LOGIKA: Minden 7. feladat szöveges (kivéve a legelső szinteket ha zavaró)
   if (State.totalSolved % 7 === 0) {
     selectedTask = WORD_PROBLEM_TEMPLATES[rand(0, WORD_PROBLEM_TEMPLATES.length - 1)].gen();
     selectedTask.isWord = true;
+    selectedTask.k = 'word_' + State.totalSolved;
   } else {
-    // 1. Hibaismétlés (Anti-Spam)
     if (State.mistakes.length > 0 && Math.random() < 0.25) {
       const validMistakes = State.mistakes.filter(m => m.k !== lastKey);
       if (validMistakes.length > 0) selectedTask = validMistakes[rand(0, validMistakes.length - 1)];
     }
-
-    // 2. Generálás
     if (!selectedTask) {
       let attempts = 0;
       while (attempts < 15) {
@@ -289,6 +264,9 @@ function nextTask() {
     if (State.recentTasks.length > 8) State.recentTasks.shift();
   }
   
+  // DINAMIKUS BILLENTYŰZET ÚJRATÖLTÉS
+  rebuildKeyboard();
+
   const eqEl = document.getElementById('task-eq');
   eqEl.textContent = selectedTask.isWord ? selectedTask.q : `${selectedTask.q} = ?`;
   eqEl.className = selectedTask.isWord ? 'task-eq word-problem' : 'task-eq';
@@ -296,34 +274,61 @@ function nextTask() {
   State.startTime = performance.now();
 }
 
+function handleKey(v) {
+  if (State.isInputLocked) return;
+  if (v === 'OK') submit();
+  else if (v === 'DEL') State.input = State.input.slice(0, -1);
+  else { 
+    if ((v === '.' || v === ',') && (State.input.includes('.') || State.input.includes(','))) return; 
+    if (State.input.length < 12) State.input += v; 
+  }
+  document.getElementById('answer-text').textContent = State.input.replace('.', ',');
+  document.getElementById('answer-box').classList.toggle('has-input', State.input.length > 0);
+}
+
+function rebuildKeyboard() {
+  const grid = document.getElementById('kb-grid'); grid.innerHTML = '';
+  // Ellenőrizzük, kell-e tizedesvessző: tizedes kategória VAGY a válaszban van pont
+  const needsDot = ['tszorz', 'toszt', 'tort'].includes(State.cat) || (State.task && State.task.a.includes('.'));
+  
+  const keys = [1, 2, 3, 4, 5, 6, 7, 8, 9, 'DEL', 0, needsDot ? ',' : 'OK'];
+  keys.forEach(v => {
+    const b = document.createElement('button'); 
+    b.className = 'kb-btn' + (v === 'OK' ? ' kb-ok' : '');
+    b.textContent = v === 'DEL' ? '⌫' : v; 
+    b.onclick = () => handleKey(v === ',' ? '.' : v);
+    grid.appendChild(b);
+  });
+  
+  if (needsDot) {
+    const ok = document.createElement('button');
+    ok.className = 'kb-btn kb-ok';
+    ok.style.gridColumn = 'span 3';
+    ok.textContent = 'OK';
+    ok.onclick = () => handleKey('OK');
+    grid.appendChild(ok);
+  }
+}
+
 function submit() {
   if (!State.input || State.isInputLocked) return;
   State.isInputLocked = true;
   const rt = performance.now() - State.startTime;
   const isCorrect = fmt(parseFloat(State.input.replace(',', '.'))) === State.task.a;
-  State.history.push({ q: State.task.q, ua: State.input, ca: State.task.a, ok: isCorrect, rt });
+  State.history.push({ q: State.task.isWord ? State.task.q : State.task.q, ua: State.input, ca: State.task.a, ok: isCorrect, rt });
   
   let nextDelay = 150;
-
   if (isCorrect) {
     State.streak++;
-    if (!State.task.isWord) State.mistakes = State.mistakes.filter(m => m.k !== State.task.k);
-    
-    const cat = CATS[State.cat];
-    const dynamicBonus = cat.bBase + (State.level * cat.bInc);
-    let points = State.task.isWord ? 5 : 1; // A szöveges feladat több pontot ér!
-    if (rt < dynamicBonus) points++;
-    State.score += points;
-    
-    if (State.streak >= 5 && State.level < 5) { State.level++; State.streak = 0; showLevelUp(); }
+    State.score += (State.task.isWord ? 5 : 1);
+    if (State.streak >= 5 && State.level < 5) { State.level++; showLevelUp(); }
     const el = document.getElementById('score-num'); el.textContent = State.score; el.classList.add('bump');
     setTimeout(() => el.classList.remove('bump'), 200);
   } else {
     State.streak = 0;
-    if (!State.task.isWord && !State.mistakes.find(m => m.k === State.task.k)) State.mistakes.push(State.task);
-    
     const tip = analyzeError(State.task, State.input, State.cat);
     if (tip) { showTip(tip); nextDelay = 2500; }
+    if (!State.task.isWord && !State.mistakes.find(m => m.k === State.task.k)) State.mistakes.push(State.task);
   }
   setTimeout(nextTask, nextDelay);
 }
@@ -347,32 +352,13 @@ function renderHistory() {
   const container = document.getElementById('history-list'); container.innerHTML = '';
   [...State.history].reverse().slice(0, 10).forEach(h => {
     const item = document.createElement('div'); item.className = `history-item ${h.ok ? 'correct' : ''}`;
-    const shortQ = h.q.length > 25 ? h.q.substring(0, 22) + '...' : h.q;
-    item.innerHTML = `<div style="flex:1">${shortQ} = <b>${h.ua}</b> ${!h.ok ? `<span style="color:var(--text-dim); font-size: 0.9em;"> (${h.ca})</span>` : ''}</div><div style="font-size:11px; opacity:0.6;">${Math.round(h.rt)}ms</div>`;
+    const shortQ = h.q.length > 35 ? h.q.substring(0, 32) + '...' : h.q;
+    item.innerHTML = `<div style="flex:1">${shortQ} = <b>${h.ua.replace('.', ',')}</b> ${!h.ok ? `<span style="color:var(--text-dim); font-size: 0.9em;"> (${h.ca.replace('.', ',')})</span>` : ''}</div>`;
     container.appendChild(item);
   });
 }
 
-function handleKey(v) {
-  if (State.isInputLocked) return;
-  if (v === 'OK') submit();
-  else if (v === 'DEL') State.input = State.input.slice(0, -1);
-  else { if ((v === '.' || v === ',') && (State.input.includes('.') || State.input.includes(','))) return; if (State.input.length < 12) State.input += v; }
-  document.getElementById('answer-text').textContent = State.input.replace('.', ',');
-  document.getElementById('answer-box').classList.toggle('has-input', State.input.length > 0);
-}
-
-function rebuildKeyboard(showDot) {
-  const grid = document.getElementById('kb-grid'); grid.innerHTML = '';
-  [1, 2, 3, 4, 5, 6, 7, 8, 9, 'DEL', 0, showDot ? ',' : 'OK'].forEach(v => {
-    const b = document.createElement('button'); b.className = 'kb-btn' + (v === 'OK' ? ' kb-ok' : '');
-    b.textContent = v === 'DEL' ? '⌫' : v; b.onclick = () => handleKey(v === ',' ? '.' : v);
-    grid.appendChild(b);
-  });
-  if (showDot) { const ok = document.createElement('button'); ok.className = 'kb-btn kb-ok'; ok.style.gridColumn = 'span 3'; ok.textContent = 'OK'; ok.onclick = () => handleKey('OK'); grid.appendChild(ok); }
-}
-
-function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden')); const target = document.getElementById(id); if (target) { target.classList.remove('hidden'); target.scrollTop = 0; } }
+function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden')); const target = document.getElementById(id); if (target) target.classList.remove('hidden'); }
 
 (function initStars() {
   const c = document.getElementById('stars-canvas'); const ctx = c.getContext('2d');
