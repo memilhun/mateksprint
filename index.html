@@ -43,6 +43,8 @@
       color: var(--text);
     }
 
+    .stars-bg { position: fixed; inset: 0; pointer-events: none; z-index: -1; }
+
     .screen {
       position: absolute; inset: 0;
       display: flex; flex-direction: column; align-items: center;
@@ -63,12 +65,10 @@
       background: linear-gradient(135deg, #4cc9f0, #ff6b9d);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
     }
-    .logo-sub, .category-group h2 { font-size: 13px; color: var(--text-dim); margin-top: 3px; letter-spacing: 1px; text-transform: uppercase; }
+    .logo-sub { font-size: 13px; color: var(--text-dim); margin-top: 3px; letter-spacing: 1px; text-transform: uppercase; }
 
     .categories { width: 100%; display: flex; flex-direction: column; gap: 20px; padding-bottom: 40px; }
-    .category-group { display: flex; flex-direction: column; gap: 10px; }
-    .category-group-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
+    
     .cat-btn {
       --c: var(--c1);
       background: var(--surface);
@@ -83,14 +83,8 @@
       background: radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--c) 18%, transparent), transparent 70%);
     }
     .cat-btn:active { transform: scale(.95); }
-    .cat-btn[data-cat="szorzas"] { --c: var(--c1); }
-    .cat-btn[data-cat="osztas"]  { --c: var(--c2); }
-    .cat-btn[data-cat="tszorz"]  { --c: var(--c3); }
-    .cat-btn[data-cat="toszt"], .cat-btn[data-cat="toszt10"]   { --c: var(--c4); }
-    .cat-btn[data-cat="tort"]    { --c: #ffd166; }
-
-    .cat-icon { font-family: var(--font-num); font-size: 28px; font-weight: 700; color: var(--c); line-height: 1; }
-    .cat-name { font-size: 11px; font-weight: 800; text-align: center; color: var(--text); line-height: 1.3; }
+    
+    .cat-name { font-size: 11px; font-weight: 800; text-align: center; color: var(--text); line-height: 1.3; text-transform: uppercase; }
     .cat-hs   { font-family: var(--font-num); font-size: 10px; color: var(--text-dim); margin-top: 2px; }
     .cat-hs b { color: var(--c); }
 
@@ -101,15 +95,15 @@
     .score-num.bump { transform: scale(1.3); color: var(--ok); }
     .timer-num   { font-family: var(--font-num); font-size: 44px; font-weight: 700; color: var(--text); line-height: 1; }
     .timer-num.danger { color: var(--danger); animation: shake 0.5s infinite; }
+    
     @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-2px); } 75% { transform: translateX(2px); } }
 
     .progress-bar  { width: 100%; height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
-    .progress-fill { height: 100%; width: 100%; background: var(--accent); transition: width 1s linear; }
+    .progress-fill { height: 100%; width: 100%; background: var(--accent); transition: width 1.05s linear; }
 
     .task-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; width: 100%; position: relative; }
     .task-eq   { font-family: var(--font-num); font-size: clamp(32px, 10vw, 52px); font-weight: 700; color: var(--text); text-align: center; }
 
-    /* Level Up Pop */
     #level-up-pop {
       position: absolute; top: 20%; font-weight: 900; font-size: 24px; color: #ffd60a;
       text-shadow: 0 0 15px rgba(255,214,10,0.5); pointer-events: none; opacity: 0;
@@ -122,7 +116,6 @@
       min-width: 160px; min-height: 70px; background: var(--surface);
       border: 3px solid color-mix(in srgb, var(--accent) 30%, transparent);
       border-radius: 18px; display: flex; align-items: center; justify-content: center;
-      transition: border-color .15s, transform 0.1s;
     }
     .answer-box.has-input { border-color: var(--accent); }
     .cursor { display: inline-block; width: 3px; height: 1em; background: var(--accent); margin-left: 4px; animation: blink .8s step-end infinite; }
@@ -152,9 +145,8 @@
     .history-list { display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 15px; }
     .history-item { display: flex; align-items: center; background: var(--surface); padding: 12px; border-radius: 12px; border-left: 4px solid var(--danger); gap: 10px; }
     .history-item.correct { border-left-color: var(--ok); }
-    .btn-primary { width: 100%; max-width: 300px; padding: 18px; border-radius: 18px; background: var(--accent); color: #fff; font-weight: 800; border: none; font-size: 18px; cursor: pointer; }
     
-    .stars-bg { position: fixed; inset: 0; pointer-events: none; z-index: -1; }
+    .btn-primary { width: 100%; max-width: 300px; padding: 18px; border-radius: 18px; background: var(--accent); color: #fff; font-weight: 800; border: none; font-size: 18px; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -165,8 +157,7 @@
     <div class="logo">MatekSprint</div>
     <div class="logo-sub">Gyakorolj naponta!</div>
   </div>
-  <div class="categories" id="cat-list">
-    </div>
+  <div class="categories" id="cat-list"></div>
 </div>
 
 <div class="screen hidden" id="game">
@@ -177,7 +168,7 @@
   <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
   <div class="task-area">
     <div id="level-up-pop">LEVEL UP! 🚀</div>
-    <div class="cat-badge" id="cat-badge"></div>
+    <div class="cat-badge" id="cat-badge" style="font-size: 12px; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px;"></div>
     <div class="task-eq" id="task-eq"></div>
     <div class="answer-box" id="answer-box">
       <span id="answer-text"></span><span class="cursor"></span>
@@ -187,159 +178,235 @@
 </div>
 
 <div class="screen hidden" id="result">
-  <div class="result-top">
+  <div class="result-top" style="text-align: center; width: 100%;">
     <div class="result-num" id="result-num">0</div>
-    <div class="stars" id="result-stars">⭐⭐⭐</div>
-    <div class="result-hs-wrap">
-      <div id="new-record" style="color:#ffd60a; font-weight:800; display:none;">🏆 ÚJ REKORD!</div>
+    <div class="stars" id="result-stars" style="font-size: 24px; margin: 5px 0;">⭐⭐⭐</div>
+    <div class="result-hs-wrap" style="margin: 10px auto;">
+      <div id="new-record" style="color:#ffd60a; font-weight:800; display:none; margin-bottom: 5px;">🏆 ÚJ REKORD!</div>
       <div class="stats-grid">
         <div class="stat-box">Pontosság<b id="res-acc">0%</b></div>
         <div class="stat-box">Átlagidő<b id="res-time">0ms</b></div>
       </div>
-      <div style="margin-top:10px; font-size:12px;">Szint: <b id="res-level" style="color:var(--accent)">1</b></div>
+      <div style="margin-top:10px; font-size:12px;">Elért szint: <b id="res-level" style="color:var(--accent)">1</b></div>
     </div>
     <div class="result-btns" style="margin-top:20px; width:100%; display:flex; flex-direction:column; align-items:center; gap:10px;">
       <button class="btn-primary" id="btn-retry">Újra!</button>
-      <button style="background:none; border:none; color:var(--text-dim); cursor:pointer;" id="btn-home">Vissza a menübe</button>
+      <button style="background:none; border:none; color:var(--text-dim); cursor:pointer; padding: 10px;" id="btn-home">Vissza a menübe</button>
     </div>
   </div>
-  <div class="history-wrap">
+  <div class="history-wrap" style="width: 100%; max-width: 400px; padding-bottom: 40px;">
     <div class="history-list" id="history-list"></div>
   </div>
 </div>
 
 <script>
-// --- KONFIGURÁCIÓ & ENGINE ---
+/**
+ * MatekSprint Pro - Refactored Engine
+ */
+
 const CATS = {
-  szorzas: { name:'Szorzótábla', color:'#4cc9f0', bonusTime: 2000, 
-    gen: (l) => { const a=rand(2, 5+l*2), b=rand(2, 9); return {q:`${a} × ${b}`, a:a*b, k:`${a}x${b}`} } },
-  osztas: { name:'Osztás', color:'#ff9e00', bonusTime: 3500,
-    gen: (l) => { const b=rand(2, 6+l), c=rand(2, 8+l); return {q:`${b*c} ÷ ${b}`, a:c, k:`${b*c}d${b}`} } },
-  tszorz: { name:'Tizedes szorzás', color:'#06d6a0', bonusTime: 3000,
-    gen: (l) => { const m=[10,100,1000][rand(0,Math.min(2,l-1))]; const v=rand(11,99)/10; return {q:`${v} × ${m}`, a:v*m, k:`${v}x${m}`} } },
-  toszt: { name:'Tizedes osztás', color:'#ff6b9d', bonusTime: 4000,
-    gen: (l) => { const c=rand(1,30+(l*10)), b=rand(2,5); return {q:`${fmt(c*b/10)} ÷ ${b}`, a:c/10, k:`${c}d${b}`} } },
-  tort: { name:'Törtek', color:'#ffd166', bonusTime: 4500,
-    gen: (l) => { const d=[2,4,5,8,10,20,25][rand(0,Math.min(6,l))]; const n=rand(1,d-1); return {q:`${n} / ${d}`, a:n/d, k:`${n}/${d}`} } }
+  szorzas: { id: 'szorzas', name:'Szorzótábla', color:'#4cc9f0', bonusTime: 2000, 
+    gen: (l) => { const a=rand(2, 5+l*2), b=rand(2, 9); return {q:`${a} × ${b}`, a:(a*b).toString(), k:`${a}x${b}`} } },
+  osztas: { id: 'osztas', name:'Osztás', color:'#ff9e00', bonusTime: 3500,
+    gen: (l) => { const b=rand(2, 6+l), c=rand(2, 8+l); return {q:`${b*c} ÷ ${b}`, a:c.toString(), k:`${b*c}d${b}`} } },
+  tszorz: { id: 'tszorz', name:'Tizedes szorzás', color:'#06d6a0', bonusTime: 3000,
+    gen: (l) => { const m=[10,100,1000][Math.min(2, rand(0, l-1))]; const v=rand(11,99)/10; return {q:`${v} × ${m}`, a:fmt(v*m), k:`${v}x${m}`} } },
+  toszt: { id: 'toszt', name:'Tizedes osztás', color:'#ff6b9d', bonusTime: 4000,
+    gen: (l) => { const c=rand(1,30+(l*10)), b=rand(2,5); return {q:`${fmt(c*b/10)} ÷ ${b}`, a:fmt(c/10), k:`${c}d${b}`} } },
+  tort: { id: 'tort', name:'Törtek', color:'#ffd166', bonusTime: 4500,
+    gen: (l) => { const d=[2,4,5,8,10,20,25][Math.min(6, l)]; const n=rand(1,d-1); return {q:`${n} / ${d}`, a:fmt(n/d), k:`${n}/${d}`} } }
 };
 
-let S = { cat:null, score:0, time:60, timer:null, task:null, input:'', history:[], mistakes:[], level:1, streak:0, start:0 };
+// Application State
+let State = {
+  cat: null,
+  score: 0,
+  time: 60,
+  timerInterval: null,
+  task: null,
+  input: '',
+  history: [],
+  mistakes: [],
+  level: 1,
+  streak: 0,
+  startTime: 0,
+  isInputLocked: false
+};
 
 // --- HELPERS ---
-const rand = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
-const fmt = n => parseFloat(n.toFixed(8)).toString();
-const getStats = (id) => JSON.parse(localStorage.getItem('stats_'+id)) || { hs:0, avgT:0, acc:0, plays:0 };
+function rand(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
+function fmt(n) { return parseFloat(Number(n).toFixed(8)).toString(); }
+function getStats(id) { 
+  try {
+    return JSON.parse(localStorage.getItem('stats_' + id)) || { hs: 0, avgT: 0, acc: 0, plays: 0 };
+  } catch (e) {
+    return { hs: 0, avgT: 0, acc: 0, plays: 0 };
+  }
+}
 
-// --- UI GENERÁLÁS ---
+// --- CORE FUNCTIONS ---
 function renderHome() {
   const container = document.getElementById('cat-list');
   container.innerHTML = '';
-  Object.keys(CATS).forEach(id => {
-    const stats = getStats(id);
+  Object.values(CATS).forEach(cat => {
+    const stats = getStats(cat.id);
     const btn = document.createElement('div');
     btn.className = 'cat-btn';
-    btn.dataset.cat = id;
+    btn.style.setProperty('--c', cat.color);
     btn.innerHTML = `
-      <div class="cat-name">${CATS[id].name}</div>
-      <div class="cat-hs">Rekord: <b>${stats.hs}</b> | Idő: <b>${stats.avgT}ms</b></div>
+      <div class="cat-name">${cat.name}</div>
+      <div class="cat-hs">Rekord: <b>${stats.hs}</b> | Átl. idő: <b>${stats.avgT}ms</b></div>
     `;
-    btn.onclick = () => startGame(id);
+    btn.onclick = () => startGame(cat.id);
     container.appendChild(btn);
   });
   showScreen('home');
 }
 
-// --- JÁTÉK LOGIKA ---
 function startGame(id) {
-  S = { cat:id, score:0, time:60, timer:null, task:null, input:'', history:[], mistakes:[], level:1, streak:0, start:0 };
-  document.documentElement.style.setProperty('--accent', CATS[id].color);
-  document.getElementById('cat-badge').textContent = CATS[id].name;
+  // Clear any existing timer to prevent leaks
+  if (State.timerInterval) clearInterval(State.timerInterval);
+
+  // Initialize State
+  State = {
+    cat: id,
+    score: 0,
+    time: 60,
+    timerInterval: null,
+    task: null,
+    input: '',
+    history: [],
+    mistakes: [],
+    level: 1,
+    streak: 0,
+    startTime: 0,
+    isInputLocked: false
+  };
+
+  const catCfg = CATS[id];
+  document.documentElement.style.setProperty('--accent', catCfg.color);
+  document.getElementById('cat-badge').textContent = catCfg.name;
   document.getElementById('score-num').textContent = '0';
+  document.getElementById('timer-num').textContent = '60';
+  document.getElementById('timer-num').classList.remove('danger');
+  document.getElementById('progress-fill').style.width = '100%';
+  
   rebuildKeyboard(id !== 'szorzas' && id !== 'osztas');
   nextTask();
   showScreen('game');
-  S.timer = setInterval(() => {
-    S.time--;
-    document.getElementById('timer-num').textContent = S.time;
-    document.getElementById('progress-fill').style.width = (S.time/60*100)+'%';
-    if (S.time <= 10) document.getElementById('timer-num').classList.add('danger');
-    if (S.time <= 0) endGame();
+
+  State.timerInterval = setInterval(() => {
+    State.time--;
+    const timerEl = document.getElementById('timer-num');
+    timerEl.textContent = State.time;
+    document.getElementById('progress-fill').style.width = (State.time / 60 * 100) + '%';
+    
+    if (State.time <= 10) timerEl.classList.add('danger');
+    if (State.time <= 0) endGame();
   }, 1000);
 }
 
 function nextTask() {
-  S.input = '';
+  State.input = '';
+  State.isInputLocked = false;
   document.getElementById('answer-text').textContent = '';
-  // 30% Spaced Repetition
-  if (S.mistakes.length > 0 && Math.random() < 0.3) {
-    S.task = S.mistakes[rand(0, S.mistakes.length-1)];
+  document.getElementById('answer-box').classList.remove('has-input');
+
+  // Spaced Repetition (30% probability)
+  if (State.mistakes.length > 0 && Math.random() < 0.3) {
+    State.task = State.mistakes[rand(0, State.mistakes.length - 1)];
   } else {
-    const t = CATS[S.cat].gen(S.level);
-    S.task = { q: t.q, a: fmt(t.a), k: t.k };
+    const t = CATS[State.cat].gen(State.level);
+    State.task = { q: t.q, a: t.a, k: t.k };
   }
-  document.getElementById('task-eq').textContent = S.task.q + ' = ?';
-  S.start = performance.now();
+  
+  document.getElementById('task-eq').textContent = `${State.task.q} = ?`;
+  State.startTime = performance.now();
 }
 
 function submit() {
-  if (!S.input) return;
-  const rt = performance.now() - S.start;
-  const isCorrect = fmt(parseFloat(S.input.replace(',','.'))) === S.task.a;
+  if (!State.input || State.isInputLocked) return;
+  
+  State.isInputLocked = true;
+  const rt = performance.now() - State.startTime;
+  const normalizedInput = State.input.replace(',', '.');
+  const isCorrect = fmt(parseFloat(normalizedInput)) === State.task.a;
 
-  S.history.push({ q: S.task.q, ua: S.input, ca: S.task.a, ok: isCorrect, rt });
+  State.history.push({ 
+    q: State.task.q, 
+    ua: State.input, 
+    ca: State.task.a, 
+    ok: isCorrect, 
+    rt 
+  });
 
   if (isCorrect) {
-    S.streak++;
-    let p = 1;
-    if (rt < CATS[S.cat].bonusTime) p++; // Kategória specifikus bónusz
-    if (S.level > 3) p++;
-    S.score += p;
+    State.streak++;
+    let points = 1;
+    if (rt < CATS[State.cat].bonusTime) points++;
+    if (State.level > 3) points++;
+    State.score += points;
     
-    // Level Up logika
-    if (S.streak >= 5 && S.level < 5) {
-      S.level++; S.streak = 0;
+    if (State.streak >= 5 && State.level < 5) {
+      State.level++; 
+      State.streak = 0;
       showLevelUp();
     }
     
     const el = document.getElementById('score-num');
-    el.textContent = S.score;
-    el.classList.add('bump'); setTimeout(()=>el.classList.remove('bump'), 200);
+    el.textContent = State.score;
+    el.classList.add('bump'); 
+    setTimeout(() => el.classList.remove('bump'), 200);
   } else {
-    S.streak = 0;
-    S.mistakes.push(S.task);
-    if (S.level > 1) S.level--;
+    State.streak = 0;
+    // Avoid duplicates in mistakes
+    if (!State.mistakes.find(m => m.k === State.task.k)) {
+      State.mistakes.push(State.task);
+    }
+    if (State.level > 1) State.level--;
   }
+
+  // Brief pause for visual feedback could be here, but per requirements we maintain logic
   nextTask();
 }
 
 function showLevelUp() {
   const pop = document.getElementById('level-up-pop');
-  pop.textContent = `LEVEL ${S.level} 🚀`;
+  pop.textContent = `SZINT ${State.level} 🚀`;
   pop.classList.add('show');
   setTimeout(() => pop.classList.remove('show'), 1500);
 }
 
 function endGame() {
-  clearInterval(S.timer);
-  const stats = getStats(S.cat);
-  const correct = S.history.filter(h => h.ok).length;
-  const acc = S.history.length ? Math.round(correct/S.history.length*100) : 0;
-  const avg = S.history.length ? Math.round(S.history.reduce((a,b)=>a+b.rt,0)/S.history.length) : 0;
+  if (State.timerInterval) clearInterval(State.timerInterval);
+  
+  const stats = getStats(State.cat);
+  const total = State.history.length;
+  const correct = State.history.filter(h => h.ok).length;
+  const acc = total ? Math.round((correct / total) * 100) : 0;
+  const avg = total ? Math.round(State.history.reduce((s, h) => s + h.rt, 0) / total) : 0;
 
-  // Mentés
-  const isNewHs = S.score > stats.hs;
-  localStorage.setItem('stats_'+S.cat, JSON.stringify({
-    hs: Math.max(stats.hs, S.score),
+  const isNewHs = State.score > stats.hs;
+  
+  // Save Stats
+  localStorage.setItem('stats_' + State.cat, JSON.stringify({
+    hs: Math.max(stats.hs, State.score),
     avgT: stats.plays === 0 ? avg : Math.round((stats.avgT + avg) / 2),
     acc: stats.plays === 0 ? acc : Math.round((stats.acc + acc) / 2),
     plays: (stats.plays || 0) + 1
   }));
 
-  document.getElementById('result-num').textContent = S.score;
+  // Render Results
+  document.getElementById('result-num').textContent = State.score;
   document.getElementById('new-record').style.display = isNewHs ? 'block' : 'none';
   document.getElementById('res-acc').textContent = acc + '%';
   document.getElementById('res-time').textContent = avg + 'ms';
-  document.getElementById('res-level').textContent = S.level;
+  document.getElementById('res-level').textContent = State.level;
+  
+  let starStr = '⭐';
+  if (acc > 50) starStr = '⭐⭐';
+  if (acc > 85 && State.score > 10) starStr = '⭐⭐⭐';
+  document.getElementById('result-stars').textContent = starStr;
   
   renderHistory();
   showScreen('result');
@@ -348,57 +415,117 @@ function endGame() {
 function renderHistory() {
   const container = document.getElementById('history-list');
   container.innerHTML = '';
-  S.history.slice(-10).reverse().forEach(h => {
+  
+  [...State.history].reverse().slice(0, 10).forEach(h => {
     const item = document.createElement('div');
-    item.className = `history-item ${h.ok?'correct':''}`;
-    item.innerHTML = `<div>${h.q} = <b>${h.ua}</b> ${!h.ok ? ` (helyes: ${h.ca})` : ''}</div><div style="margin-left:auto; font-size:10px; opacity:0.6">${Math.round(h.rt)}ms</div>`;
+    item.className = `history-item ${h.ok ? 'correct' : ''}`;
+    item.innerHTML = `
+      <div style="flex:1">
+        ${h.q} = <b>${h.ua}</b> 
+        ${!h.ok ? `<span style="color:var(--text-dim); font-size: 0.9em;"> (helyes: ${h.ca})</span>` : ''}
+      </div>
+      <div style="font-size:10px; opacity:0.6; font-family: var(--font-num);">${Math.round(h.rt)}ms</div>
+    `;
     container.appendChild(item);
   });
 }
 
-// --- BILLENTYŰZET ---
+// --- UI & INPUT ---
 function handleKey(v) {
-  if (v === 'OK') submit();
-  else if (v === 'DEL') S.input = S.input.slice(0,-1);
-  else if (S.input.length < 8) S.input += v;
-  document.getElementById('answer-text').textContent = S.input;
-  document.getElementById('answer-box').classList.toggle('has-input', S.input.length > 0);
+  if (State.isInputLocked) return;
+
+  if (v === 'OK') {
+    submit();
+  } else if (v === 'DEL') {
+    State.input = State.input.slice(0, -1);
+  } else {
+    // Prevent multiple commas/dots
+    if ((v === '.' || v === ',') && (State.input.includes('.') || State.input.includes(','))) return;
+    if (State.input.length < 8) State.input += v;
+  }
+  
+  const displayInput = State.input.replace('.', ',');
+  document.getElementById('answer-text').textContent = displayInput;
+  document.getElementById('answer-box').classList.toggle('has-input', State.input.length > 0);
 }
 
-function rebuildKeyboard(dot) {
+function rebuildKeyboard(showDot) {
   const grid = document.getElementById('kb-grid');
   grid.innerHTML = '';
-  [1,2,3,4,5,6,7,8,9].forEach(n => {
-    const b = document.createElement('button'); b.className = 'kb-btn'; b.textContent = n;
-    b.onclick = () => handleKey(n.toString()); grid.appendChild(b);
+  
+  // Standard numbers 1-9
+  [1, 2, 3, 4, 5, 6, 7, 8, 9].forEach(n => {
+    const b = document.createElement('button');
+    b.className = 'kb-btn';
+    b.textContent = n;
+    b.onclick = () => handleKey(n.toString());
+    grid.appendChild(b);
   });
-  const del = document.createElement('button'); del.className = 'kb-btn'; del.textContent = '⌫'; del.onclick = () => handleKey('DEL'); grid.appendChild(del);
-  const zero = document.createElement('button'); zero.className = 'kb-btn'; zero.textContent = '0'; zero.onclick = () => handleKey('0'); grid.appendChild(zero);
-  if (dot) {
-    const d = document.createElement('button'); d.className = 'kb-btn'; d.textContent = ','; d.onclick = () => handleKey('.'); grid.appendChild(d);
-  }
-  const ok = document.createElement('button'); ok.className = 'kb-btn kb-ok'; ok.style.gridColumn = dot ? 'span 3' : 'span 1';
-  ok.textContent = 'OK'; ok.onclick = () => handleKey('OK'); grid.appendChild(ok);
-}
 
-// --- STARFIELD ---
-(function(){
-  const c = document.getElementById('stars-canvas'); const ctx = c.getContext('2d');
-  c.width = window.innerWidth; c.height = window.innerHeight;
-  for (let i=0; i<60; i++) {
-    ctx.beginPath(); ctx.arc(Math.random()*c.width, Math.random()*c.height, Math.random()*1.2, 0, Math.PI*2);
-    ctx.fillStyle = `rgba(255,255,255,${Math.random()*0.3})`; ctx.fill();
+  // Backspace
+  const del = document.createElement('button');
+  del.className = 'kb-btn';
+  del.textContent = '⌫';
+  del.onclick = () => handleKey('DEL');
+  grid.appendChild(del);
+
+  // Zero
+  const zero = document.createElement('button');
+  zero.className = 'kb-btn';
+  zero.textContent = '0';
+  zero.onclick = () => handleKey('0');
+  grid.appendChild(zero);
+
+  // Conditional Dot/Comma
+  if (showDot) {
+    const dot = document.createElement('button');
+    dot.className = 'kb-btn';
+    dot.textContent = ',';
+    dot.onclick = () => handleKey('.');
+    grid.appendChild(dot);
   }
-})();
+
+  // OK Button
+  const ok = document.createElement('button');
+  ok.className = 'kb-btn kb-ok';
+  ok.style.gridColumn = showDot ? 'span 3' : 'span 1';
+  ok.textContent = 'OK';
+  ok.onclick = () => handleKey('OK');
+  grid.appendChild(ok);
+}
 
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-  document.getElementById(id).classList.remove('hidden');
+  const target = document.getElementById(id);
+  if (target) {
+    target.classList.remove('hidden');
+    target.scrollTop = 0;
+  }
 }
 
-document.getElementById('btn-home').onclick = renderHome;
-document.getElementById('btn-retry').onclick = () => startGame(S.cat);
+// --- INITIALIZATION ---
+(function initStars() {
+  const c = document.getElementById('stars-canvas');
+  const ctx = c.getContext('2d');
+  const resize = () => {
+    c.width = window.innerWidth;
+    c.height = window.innerHeight;
+    ctx.clearRect(0,0,c.width, c.height);
+    for (let i = 0; i < 70; i++) {
+      ctx.beginPath();
+      ctx.arc(Math.random() * c.width, Math.random() * c.height, Math.random() * 1.5, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.4})`;
+      ctx.fill();
+    }
+  };
+  window.onresize = resize;
+  resize();
+})();
 
+document.getElementById('btn-home').onclick = renderHome;
+document.getElementById('btn-retry').onclick = () => startGame(State.cat);
+
+// Start
 renderHome();
 </script>
 </body>
