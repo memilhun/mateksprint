@@ -3,79 +3,234 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>MatekSprint Pro - Full Analytics</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="MatekSprint">
+  <meta name="theme-color" content="#0f0f1a">
+  <title>MatekSprint Pro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Nunito:wght@500;700;800;900&display=swap" rel="stylesheet">
+
   <style>
-    /* ... (Stílusok: az előzőekben megbeszélt neon/dark téma + hiba indikátorok) ... */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root { --bg:#0f0f1a; --surface:#1a1a2e; --surface2:#252540; --text:#f0f0ff; --text-dim:#8888aa; --c1:#4cc9f0; --c2:#ff9e00; --c3:#06d6a0; --c4:#ff6b9d; --c5:#ffd166; --danger:#ff4d6d; --ok:#06d6a0; --font-ui:'Nunito', sans-serif; --font-num:'Space Mono', monospace; --accent:#4cc9f0; }
-    body { height: 100vh; font-family: var(--font-ui); background: var(--bg); color: var(--text); overflow: hidden; }
-    .screen { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; padding: 20px; transition: 0.2s; overflow-y: auto; }
+
+    :root {
+      --bg:       #0f0f1a;
+      --surface:  #1a1a2e;
+      --surface2: #252540;
+      --text:     #f0f0ff;
+      --text-dim: #8888aa;
+      --c1: #4cc9f0;
+      --c2: #ff9e00;
+      --c3: #06d6a0;
+      --c4: #ff6b9d;
+      --danger: #ff4d6d;
+      --ok:     #06d6a0;
+      --font-ui:  'Nunito', sans-serif;
+      --font-num: 'Space Mono', monospace;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bot: env(safe-area-inset-bottom, 0px);
+      --accent: #4cc9f0;
+    }
+
+    html, body {
+      height: 100%; width: 100%;
+      overflow: hidden;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      font-family: var(--font-ui);
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .screen {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center;
+      padding-top: calc(var(--safe-top) + 12px);
+      padding-bottom: calc(var(--safe-bot) + 12px);
+      padding-left: 16px; padding-right: 16px;
+      transition: opacity .18s ease, transform .18s ease;
+      overflow: hidden;
+    }
     .screen.hidden { opacity: 0; pointer-events: none; transform: scale(.96); }
-    .logo { font-family: var(--font-num); font-size: 32px; font-weight: 700; background: linear-gradient(135deg, var(--c1), var(--c4)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 20px 0; }
-    .categories { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 12px; }
-    .cat-btn { background: var(--surface); border: 2px solid var(--surface2); border-radius: 16px; padding: 15px; cursor: pointer; transition: 0.1s; }
-    .cat-btn:active { transform: scale(0.98); }
-    .cat-name { font-weight: 800; font-size: 15px; }
-    .err-analysis { display: flex; gap: 4px; margin-top: 8px; }
-    .err-dot { font-size: 9px; padding: 2px 6px; border-radius: 4px; background: var(--surface2); color: var(--text-dim); font-family: var(--font-num); border: 1px solid transparent; }
-    .err-dot.active { background: rgba(255, 77, 109, 0.15); color: var(--danger); border-color: var(--danger); font-weight: 700; }
-    .task-eq { font-family: var(--font-num); font-size: clamp(32px, 8vw, 48px); font-weight: 700; margin: 30px 0; }
-    .answer-box { font-family: var(--font-num); font-size: 36px; background: var(--surface); padding: 12px 25px; border-radius: 15px; border: 3px solid var(--accent); min-width: 140px; text-align: center; margin-bottom: 20px; }
-    .kb-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 100%; max-width: 320px; }
-    .kb-btn { background: var(--surface); border: 1px solid var(--surface2); color: white; padding: 18px; border-radius: 12px; font-family: var(--font-num); font-size: 22px; cursor: pointer; }
-    .kb-ok { background: var(--accent); grid-column: span 1; }
-    .history-item { display: flex; width: 100%; background: var(--surface); margin-bottom: 6px; padding: 12px; border-radius: 10px; font-size: 14px; border-left: 4px solid transparent; }
-    .err-tag { font-size: 10px; background: var(--surface2); color: var(--danger); padding: 2px 5px; border-radius: 4px; margin-left: 8px; font-weight: 700; }
-    .stars-bg { position: fixed; inset: 0; z-index: -1; opacity: 0.4; }
+
+    /* --- HOME --- */
+    #home { justify-content: flex-start; overflow-y: auto; }
+    .home-header { width: 100%; text-align: center; padding: 18px 0 22px; flex-shrink: 0; }
+    .logo {
+      font-family: var(--font-num);
+      font-size: clamp(28px, 8vw, 38px); font-weight: 700; letter-spacing: -1px;
+      background: linear-gradient(135deg, #4cc9f0, #ff6b9d);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .logo-sub, .category-group h2 { font-size: 13px; color: var(--text-dim); margin-top: 3px; letter-spacing: 1px; text-transform: uppercase; }
+
+    .categories { width: 100%; display: flex; flex-direction: column; gap: 20px; padding-bottom: 40px; }
+    .category-group { display: flex; flex-direction: column; gap: 10px; }
+    .category-group-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .cat-btn {
+      --c: var(--c1);
+      background: var(--surface);
+      border: 2px solid color-mix(in srgb, var(--c) 40%, transparent);
+      border-radius: 20px; padding: 18px 14px 16px; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      transition: transform .12s; -webkit-user-select: none; user-select: none;
+      position: relative; overflow: hidden;
+    }
+    .cat-btn::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--c) 18%, transparent), transparent 70%);
+    }
+    .cat-btn:active { transform: scale(.95); }
+    .cat-btn[data-cat="szorzas"] { --c: var(--c1); }
+    .cat-btn[data-cat="osztas"]  { --c: var(--c2); }
+    .cat-btn[data-cat="tszorz"]  { --c: var(--c3); }
+    .cat-btn[data-cat="toszt"], .cat-btn[data-cat="toszt10"]   { --c: var(--c4); }
+    .cat-btn[data-cat="tort"]    { --c: #ffd166; }
+
+    .cat-icon { font-family: var(--font-num); font-size: 28px; font-weight: 700; color: var(--c); line-height: 1; }
+    .cat-name { font-size: 11px; font-weight: 800; text-align: center; color: var(--text); line-height: 1.3; }
+    .cat-hs   { font-family: var(--font-num); font-size: 10px; color: var(--text-dim); margin-top: 2px; }
+    .cat-hs b { color: var(--c); }
+
+    /* --- GAME --- */
+    #game { justify-content: space-between; gap: 8px; }
+    .game-topbar { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 6px 4px; }
+    .score-num   { font-family: var(--font-num); font-size: 36px; font-weight: 700; color: var(--text); line-height: 1; transition: transform .1s; }
+    .score-num.bump { transform: scale(1.3); color: var(--ok); }
+    .timer-num   { font-family: var(--font-num); font-size: 44px; font-weight: 700; color: var(--text); line-height: 1; }
+    .timer-num.danger { color: var(--danger); animation: shake 0.5s infinite; }
+    @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-2px); } 75% { transform: translateX(2px); } }
+
+    .progress-bar  { width: 100%; height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+    .progress-fill { height: 100%; width: 100%; background: var(--accent); transition: width 1s linear; }
+
+    .task-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; width: 100%; position: relative; }
+    .task-eq   { font-family: var(--font-num); font-size: clamp(32px, 10vw, 52px); font-weight: 700; color: var(--text); text-align: center; }
+
+    /* Level Up Pop */
+    #level-up-pop {
+      position: absolute; top: 20%; font-weight: 900; font-size: 24px; color: #ffd60a;
+      text-shadow: 0 0 15px rgba(255,214,10,0.5); pointer-events: none; opacity: 0;
+      transform: translateY(20px); transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    #level-up-pop.show { opacity: 1; transform: translateY(0); }
+
+    .answer-box {
+      font-family: var(--font-num); font-size: 42px; font-weight: 700; color: var(--accent);
+      min-width: 160px; min-height: 70px; background: var(--surface);
+      border: 3px solid color-mix(in srgb, var(--accent) 30%, transparent);
+      border-radius: 18px; display: flex; align-items: center; justify-content: center;
+      transition: border-color .15s, transform 0.1s;
+    }
+    .answer-box.has-input { border-color: var(--accent); }
+    .cursor { display: inline-block; width: 3px; height: 1em; background: var(--accent); margin-left: 4px; animation: blink .8s step-end infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* --- KEYBOARD --- */
+    .keyboard { width: 100%; max-width: 360px; padding-bottom: 8px; }
+    .kb-grid  { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .kb-btn {
+      font-family: var(--font-num); font-size: 24px; font-weight: 700;
+      background: var(--surface); border: 2px solid var(--surface2);
+      border-radius: 16px; color: var(--text); cursor: pointer;
+      aspect-ratio: 1.5; display: flex; align-items: center; justify-content: center;
+      transition: background .1s, transform .1s; -webkit-user-select: none;
+    }
+    .kb-btn:active { background: var(--surface2); transform: scale(0.92); }
+    .kb-btn.kb-ok  { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+    /* --- RESULT --- */
+    #result { justify-content: flex-start; overflow-y: auto; }
+    .result-num   { font-family: var(--font-num); font-size: 80px; font-weight: 700; color: var(--accent); line-height: 1; }
+    .result-hs-wrap { background: var(--surface); border-radius: 20px; padding: 16px; width: 100%; max-width: 300px; margin-top: 10px; }
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; border-top: 1px solid var(--surface2); padding-top: 10px; }
+    .stat-box { font-size: 12px; color: var(--text-dim); }
+    .stat-box b { display: block; color: var(--text); font-size: 16px; font-family: var(--font-num); }
+
+    .history-list { display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 15px; }
+    .history-item { display: flex; align-items: center; background: var(--surface); padding: 12px; border-radius: 12px; border-left: 4px solid var(--danger); gap: 10px; }
+    .history-item.correct { border-left-color: var(--ok); }
+    .btn-primary { width: 100%; max-width: 300px; padding: 18px; border-radius: 18px; background: var(--accent); color: #fff; font-weight: 800; border: none; font-size: 18px; cursor: pointer; }
+    
+    .stars-bg { position: fixed; inset: 0; pointer-events: none; z-index: -1; }
   </style>
 </head>
 <body>
 <canvas class="stars-bg" id="stars-canvas"></canvas>
 
 <div class="screen" id="home">
-  <div class="logo">MatekSprint Pro</div>
-  <div class="categories" id="cat-list"></div>
+  <div class="home-header">
+    <div class="logo">MatekSprint</div>
+    <div class="logo-sub">Gyakorolj naponta!</div>
+  </div>
+  <div class="categories" id="cat-list">
+    </div>
 </div>
 
 <div class="screen hidden" id="game">
-  <div style="width:100%; display:flex; justify-content:space-between; font-family:var(--font-num); font-weight:700;">
-    <div id="score-num" style="color:var(--ok)">0</div>
-    <div id="timer-num">60</div>
+  <div class="game-topbar">
+    <div class="score-display"><div class="score-num" id="score-num">0</div></div>
+    <div class="timer-wrap"><div class="timer-num" id="timer-num">60</div></div>
   </div>
-  <div class="task-eq" id="task-eq"></div>
-  <div class="answer-box" id="answer-box"><span id="answer-text"></span></div>
-  <div class="kb-grid" id="kb-grid"></div>
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+  <div class="task-area">
+    <div id="level-up-pop">LEVEL UP! 🚀</div>
+    <div class="cat-badge" id="cat-badge"></div>
+    <div class="task-eq" id="task-eq"></div>
+    <div class="answer-box" id="answer-box">
+      <span id="answer-text"></span><span class="cursor"></span>
+    </div>
+  </div>
+  <div class="keyboard"><div class="kb-grid" id="kb-grid"></div></div>
 </div>
 
 <div class="screen hidden" id="result">
-  <h1 id="result-num" style="font-size: 72px; color:var(--accent)">0</h1>
-  <div id="res-stats" style="margin-bottom: 20px; color:var(--text-dim)"></div>
-  <button onclick="renderHome()" style="width:100%; max-width:300px; padding:18px; border-radius:15px; background:var(--accent); border:none; color:white; font-weight:800; font-size:18px; cursor:pointer;">Vissza a menübe</button>
-  <div id="history-list" style="width: 100%; max-width:400px; margin-top:25px;"></div>
+  <div class="result-top">
+    <div class="result-num" id="result-num">0</div>
+    <div class="stars" id="result-stars">⭐⭐⭐</div>
+    <div class="result-hs-wrap">
+      <div id="new-record" style="color:#ffd60a; font-weight:800; display:none;">🏆 ÚJ REKORD!</div>
+      <div class="stats-grid">
+        <div class="stat-box">Pontosság<b id="res-acc">0%</b></div>
+        <div class="stat-box">Átlagidő<b id="res-time">0ms</b></div>
+      </div>
+      <div style="margin-top:10px; font-size:12px;">Szint: <b id="res-level" style="color:var(--accent)">1</b></div>
+    </div>
+    <div class="result-btns" style="margin-top:20px; width:100%; display:flex; flex-direction:column; align-items:center; gap:10px;">
+      <button class="btn-primary" id="btn-retry">Újra!</button>
+      <button style="background:none; border:none; color:var(--text-dim); cursor:pointer;" id="btn-home">Vissza a menübe</button>
+    </div>
+  </div>
+  <div class="history-wrap">
+    <div class="history-list" id="history-list"></div>
+  </div>
 </div>
 
 <script>
-// --- VISSZAÁLLÍTOTT ÉS BŐVÍTETT KATEGÓRIÁK ---
+// --- KONFIGURÁCIÓ & ENGINE ---
 const CATS = {
   szorzas: { name:'Szorzótábla', color:'#4cc9f0', bonusTime: 2000, 
-    gen: (l) => { const a=rand(2, 5+l*2), b=rand(2, 9); return {q:`${a} × ${b}`, a:fmt(a*b), type:'MUL'} } },
+    gen: (l) => { const a=rand(2, 5+l*2), b=rand(2, 9); return {q:`${a} × ${b}`, a:a*b, k:`${a}x${b}`} } },
   osztas: { name:'Osztás', color:'#ff9e00', bonusTime: 3500,
-    gen: (l) => { const b=rand(2, 6+l), c=rand(2, 8+l); return {q:`${b*c} ÷ ${b}`, a:fmt(c), type:'DIV', base:b*c, div:b} } },
+    gen: (l) => { const b=rand(2, 6+l), c=rand(2, 8+l); return {q:`${b*c} ÷ ${b}`, a:c, k:`${b*c}d${b}`} } },
   tszorz: { name:'Tizedes szorzás', color:'#06d6a0', bonusTime: 3000,
-    gen: (l) => { const m=[10,100,1000][rand(0,Math.min(2,l-1))]; const v=rand(11,99)/10; return {q:`${v} × ${m}`, a:fmt(v*m), type:'DEC_MUL'} } },
+    gen: (l) => { const m=[10,100,1000][rand(0,Math.min(2,l-1))]; const v=rand(11,99)/10; return {q:`${v} × ${m}`, a:v*m, k:`${v}x${m}`} } },
   toszt: { name:'Tizedes osztás', color:'#ff6b9d', bonusTime: 4000,
-    gen: (l) => { const c=rand(1,30+(l*10)), b=rand(2,5); return {q:`${fmt(c*b/10)} ÷ ${b}`, a:fmt(c/10), type:'DEC_DIV'} } },
-  tort: { name:'Törtek (Tizedesbe)', color:'#ffd166', bonusTime: 4500,
-    gen: (l) => { const d=[2,4,5,8,10,20,25][rand(0,Math.min(6,l))]; const n=rand(1,d-1); return {q:`${n} / ${d}`, a:fmt(n/d), type:'FRAC'} } }
+    gen: (l) => { const c=rand(1,30+(l*10)), b=rand(2,5); return {q:`${fmt(c*b/10)} ÷ ${b}`, a:c/10, k:`${c}d${b}`} } },
+  tort: { name:'Törtek', color:'#ffd166', bonusTime: 4500,
+    gen: (l) => { const d=[2,4,5,8,10,20,25][rand(0,Math.min(6,l))]; const n=rand(1,d-1); return {q:`${n} / ${d}`, a:n/d, k:`${n}/${d}`} } }
 };
 
-let S = { cat:null, score:0, time:60, timer:null, task:null, input:'', history:[], level:1, start:0 };
+let S = { cat:null, score:0, time:60, timer:null, task:null, input:'', history:[], mistakes:[], level:1, streak:0, start:0 };
 
+// --- HELPERS ---
 const rand = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
 const fmt = n => parseFloat(n.toFixed(8)).toString();
-const getStats = (id) => JSON.parse(localStorage.getItem('stats_'+id)) || { hs:0, avgT:0, acc:0, plays:0, errors: { M:0, D:0, R:0, F:0 } };
+const getStats = (id) => JSON.parse(localStorage.getItem('stats_'+id)) || { hs:0, avgT:0, acc:0, plays:0 };
 
+// --- UI GENERÁLÁS ---
 function renderHome() {
   const container = document.getElementById('cat-list');
   container.innerHTML = '';
@@ -83,20 +238,10 @@ function renderHome() {
     const stats = getStats(id);
     const btn = document.createElement('div');
     btn.className = 'cat-btn';
-    btn.style.borderLeft = `6px solid ${CATS[id].color}`;
-    
-    const errMap = { M:'Matek', D:'Tizedes', R:'Váltás', F:'Forma' };
-    let errHtml = '<div class="err-analysis">';
-    for(let code in errMap) {
-      const count = stats.errors[code] || 0;
-      errHtml += `<div class="err-dot ${count > 2 ? 'active' : ''}" title="${errMap[code]}: ${count}">${code}</div>`;
-    }
-    errHtml += '</div>';
-
+    btn.dataset.cat = id;
     btn.innerHTML = `
       <div class="cat-name">${CATS[id].name}</div>
-      <div class="cat-hs">Rekord: <b>${stats.hs}</b> | Átlag: <b>${stats.avgT}ms</b></div>
-      ${errHtml}
+      <div class="cat-hs">Rekord: <b>${stats.hs}</b> | Idő: <b>${stats.avgT}ms</b></div>
     `;
     btn.onclick = () => startGame(id);
     container.appendChild(btn);
@@ -104,51 +249,74 @@ function renderHome() {
   showScreen('home');
 }
 
-function getErrorCode(input, correct, task) {
-  const inp = input.replace(',', '.');
-  const userNum = parseFloat(inp);
-  if (isNaN(userNum)) return "F";
-  if (task.type === 'DIV' && (userNum === task.base || userNum === task.div)) return "R";
-  const s1 = inp.replace('.', '').replace(/^0+/, '');
-  const s2 = correct.replace('.', '').replace(/^0+/, '');
-  if (s1 === s2 && inp !== correct) return "D";
-  return "M";
-}
-
-function submit() {
-  if (!S.input) return;
-  const rt = performance.now() - S.start;
-  const cleanInput = S.input.replace(',', '.');
-  const isCorrect = fmt(parseFloat(cleanInput)) === S.task.a;
-  let errorCode = isCorrect ? null : getErrorCode(S.input, S.task.a, S.task);
-
-  S.history.push({ q: S.task.q, ua: S.input, ca: S.task.a, ok: isCorrect, rt, err: errorCode });
-
-  if (isCorrect) {
-    S.score += (rt < CATS[S.cat].bonusTime) ? 2 : 1;
-    document.getElementById('score-num').textContent = S.score;
-  }
-  nextTask();
-}
-
+// --- JÁTÉK LOGIKA ---
 function startGame(id) {
-  S = { cat:id, score:0, time:60, timer:null, task:null, input:'', history:[], level:1, start:0 };
+  S = { cat:id, score:0, time:60, timer:null, task:null, input:'', history:[], mistakes:[], level:1, streak:0, start:0 };
   document.documentElement.style.setProperty('--accent', CATS[id].color);
-  rebuildKeyboard(id.includes('t') || id === 'tort');
+  document.getElementById('cat-badge').textContent = CATS[id].name;
+  document.getElementById('score-num').textContent = '0';
+  rebuildKeyboard(id !== 'szorzas' && id !== 'osztas');
   nextTask();
   showScreen('game');
   S.timer = setInterval(() => {
     S.time--;
     document.getElementById('timer-num').textContent = S.time;
+    document.getElementById('progress-fill').style.width = (S.time/60*100)+'%';
+    if (S.time <= 10) document.getElementById('timer-num').classList.add('danger');
     if (S.time <= 0) endGame();
   }, 1000);
 }
 
 function nextTask() {
-  S.input = ''; document.getElementById('answer-text').textContent = '';
-  S.task = CATS[S.cat].gen(S.level);
-  document.getElementById('task-eq').textContent = S.task.q + " = ?";
+  S.input = '';
+  document.getElementById('answer-text').textContent = '';
+  // 30% Spaced Repetition
+  if (S.mistakes.length > 0 && Math.random() < 0.3) {
+    S.task = S.mistakes[rand(0, S.mistakes.length-1)];
+  } else {
+    const t = CATS[S.cat].gen(S.level);
+    S.task = { q: t.q, a: fmt(t.a), k: t.k };
+  }
+  document.getElementById('task-eq').textContent = S.task.q + ' = ?';
   S.start = performance.now();
+}
+
+function submit() {
+  if (!S.input) return;
+  const rt = performance.now() - S.start;
+  const isCorrect = fmt(parseFloat(S.input.replace(',','.'))) === S.task.a;
+
+  S.history.push({ q: S.task.q, ua: S.input, ca: S.task.a, ok: isCorrect, rt });
+
+  if (isCorrect) {
+    S.streak++;
+    let p = 1;
+    if (rt < CATS[S.cat].bonusTime) p++; // Kategória specifikus bónusz
+    if (S.level > 3) p++;
+    S.score += p;
+    
+    // Level Up logika
+    if (S.streak >= 5 && S.level < 5) {
+      S.level++; S.streak = 0;
+      showLevelUp();
+    }
+    
+    const el = document.getElementById('score-num');
+    el.textContent = S.score;
+    el.classList.add('bump'); setTimeout(()=>el.classList.remove('bump'), 200);
+  } else {
+    S.streak = 0;
+    S.mistakes.push(S.task);
+    if (S.level > 1) S.level--;
+  }
+  nextTask();
+}
+
+function showLevelUp() {
+  const pop = document.getElementById('level-up-pop');
+  pop.textContent = `LEVEL ${S.level} 🚀`;
+  pop.classList.add('show');
+  setTimeout(() => pop.classList.remove('show'), 1500);
 }
 
 function endGame() {
@@ -158,72 +326,78 @@ function endGame() {
   const acc = S.history.length ? Math.round(correct/S.history.length*100) : 0;
   const avg = S.history.length ? Math.round(S.history.reduce((a,b)=>a+b.rt,0)/S.history.length) : 0;
 
-  const currentErrors = { ...stats.errors };
-  S.history.forEach(h => { if(h.err) currentErrors[h.err] = (currentErrors[h.err] || 0) + 1; });
-
+  // Mentés
+  const isNewHs = S.score > stats.hs;
   localStorage.setItem('stats_'+S.cat, JSON.stringify({
     hs: Math.max(stats.hs, S.score),
     avgT: stats.plays === 0 ? avg : Math.round((stats.avgT + avg) / 2),
     acc: stats.plays === 0 ? acc : Math.round((stats.acc + acc) / 2),
-    plays: (stats.plays || 0) + 1,
-    errors: currentErrors
+    plays: (stats.plays || 0) + 1
   }));
 
   document.getElementById('result-num').textContent = S.score;
-  document.getElementById('res-stats').textContent = `Pontosság: ${acc}% | Átlagidő: ${avg}ms`;
+  document.getElementById('new-record').style.display = isNewHs ? 'block' : 'none';
+  document.getElementById('res-acc').textContent = acc + '%';
+  document.getElementById('res-time').textContent = avg + 'ms';
+  document.getElementById('res-level').textContent = S.level;
+  
   renderHistory();
   showScreen('result');
 }
 
+function renderHistory() {
+  const container = document.getElementById('history-list');
+  container.innerHTML = '';
+  S.history.slice(-10).reverse().forEach(h => {
+    const item = document.createElement('div');
+    item.className = `history-item ${h.ok?'correct':''}`;
+    item.innerHTML = `<div>${h.q} = <b>${h.ua}</b> ${!h.ok ? ` (helyes: ${h.ca})` : ''}</div><div style="margin-left:auto; font-size:10px; opacity:0.6">${Math.round(h.rt)}ms</div>`;
+    container.appendChild(item);
+  });
+}
+
+// --- BILLENTYŰZET ---
 function handleKey(v) {
   if (v === 'OK') submit();
   else if (v === 'DEL') S.input = S.input.slice(0,-1);
   else if (S.input.length < 8) S.input += v;
   document.getElementById('answer-text').textContent = S.input;
+  document.getElementById('answer-box').classList.toggle('has-input', S.input.length > 0);
 }
 
 function rebuildKeyboard(dot) {
-  const grid = document.getElementById('kb-grid'); grid.innerHTML = '';
-  [1,2,3,4,5,6,7,8,9,0].forEach(n => {
-    const b = document.createElement('button'); b.className='kb-btn'; b.textContent=n;
-    b.onclick=()=>handleKey(n.toString()); grid.appendChild(b);
+  const grid = document.getElementById('kb-grid');
+  grid.innerHTML = '';
+  [1,2,3,4,5,6,7,8,9].forEach(n => {
+    const b = document.createElement('button'); b.className = 'kb-btn'; b.textContent = n;
+    b.onclick = () => handleKey(n.toString()); grid.appendChild(b);
   });
-  if(dot) { 
-    const d=document.createElement('button'); d.className='kb-btn'; d.textContent=','; 
-    d.onclick=()=>handleKey('.'); grid.appendChild(d); 
+  const del = document.createElement('button'); del.className = 'kb-btn'; del.textContent = '⌫'; del.onclick = () => handleKey('DEL'); grid.appendChild(del);
+  const zero = document.createElement('button'); zero.className = 'kb-btn'; zero.textContent = '0'; zero.onclick = () => handleKey('0'); grid.appendChild(zero);
+  if (dot) {
+    const d = document.createElement('button'); d.className = 'kb-btn'; d.textContent = ','; d.onclick = () => handleKey('.'); grid.appendChild(d);
   }
-  const del=document.createElement('button'); del.className='kb-btn'; del.textContent='⌫'; del.onclick=()=>handleKey('DEL'); grid.appendChild(del);
-  const ok=document.createElement('button'); ok.className='kb-btn kb-ok'; ok.textContent='OK'; ok.onclick=()=>handleKey('OK'); grid.appendChild(ok);
+  const ok = document.createElement('button'); ok.className = 'kb-btn kb-ok'; ok.style.gridColumn = dot ? 'span 3' : 'span 1';
+  ok.textContent = 'OK'; ok.onclick = () => handleKey('OK'); grid.appendChild(ok);
 }
 
-function renderHistory() {
-  const container = document.getElementById('history-list'); container.innerHTML = '';
-  S.history.slice(-10).reverse().forEach(h => {
-    const item = document.createElement('div'); 
-    item.className = `history-item ${h.ok?'correct':''}`;
-    item.style.borderLeftColor = h.ok ? 'var(--ok)' : 'var(--danger)';
-    item.innerHTML = `
-      <div style="flex:1">${h.q} = <b>${h.ua}</b> ${!h.ok ? `<span style="opacity:0.5"> (${h.ca})</span>` : ''}</div>
-      ${h.err ? `<span class="err-tag">${h.err}</span>` : ''}
-    `;
-    container.appendChild(item);
-  });
-}
+// --- STARFIELD ---
+(function(){
+  const c = document.getElementById('stars-canvas'); const ctx = c.getContext('2d');
+  c.width = window.innerWidth; c.height = window.innerHeight;
+  for (let i=0; i<60; i++) {
+    ctx.beginPath(); ctx.arc(Math.random()*c.width, Math.random()*c.height, Math.random()*1.2, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(255,255,255,${Math.random()*0.3})`; ctx.fill();
+  }
+})();
 
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
   document.getElementById(id).classList.remove('hidden');
 }
 
-// Csillagos háttér animáció
-(function(){
-  const c = document.getElementById('stars-canvas'); const ctx = c.getContext('2d');
-  c.width = window.innerWidth; c.height = window.innerHeight;
-  for (let i=0; i<80; i++) {
-    ctx.beginPath(); ctx.arc(Math.random()*c.width, Math.random()*c.height, Math.random()*1.5, 0, Math.PI*2);
-    ctx.fillStyle = `rgba(255,255,255,${Math.random()*0.5})`; ctx.fill();
-  }
-})();
+document.getElementById('btn-home').onclick = renderHome;
+document.getElementById('btn-retry').onclick = () => startGame(S.cat);
 
 renderHome();
 </script>
