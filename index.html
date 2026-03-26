@@ -61,6 +61,21 @@
     .history-item { display: flex; align-items: center; background: var(--surface); padding: 14px; border-radius: 14px; border-left: 5px solid var(--danger); gap: 12px; font-size: 15px; }
     .history-item.correct { border-left-color: var(--ok); }
     .btn-primary { width: 100%; max-width: 320px; padding: 20px; border-radius: 20px; background: var(--accent); color: #fff; font-weight: 800; border: none; font-size: 20px; cursor: pointer; }
+    .task-eq.word-problem {
+      font-size: clamp(18px, 5vw, 24px); /* Kisebb betű a szövegnek */
+      line-height: 1.4;
+      padding: 0 10px;
+      max-width: 90%;
+      font-family: var(--font-ui); /* Szövegesnél olvashatóbb betűtípus */
+    }
+    .hint-text {
+      font-size: 14px;
+      color: var(--c2);
+      margin-top: 8px;
+      font-style: italic;
+      display: none;
+    }
+    .hint-text.show { display: block; }
   </style>
 </head>
 <body>
@@ -106,11 +121,61 @@
   </div>
   <div class="history-wrap" style="width: 100%; max-width: 400px; padding-bottom: 50px;"><div class="history-list" id="history-list"></div></div>
 </div>
-
 <script>
 /**
- * MatekSprint Pro - Phase 1: Intelligent Error Analysis
+ * MatekSprint Pro - Phase 2: Contextual & Interleaved Learning
  */
+
+// --- SZÖVEGES FELADAT GENERÁTOROK ---
+const WORD_PROBLEM_TEMPLATES = [
+  {
+    gen: () => {
+      const names = ["Anna", "Bence", "Cili", "Dávid"];
+      const items = ["csokit", "matricát", "almát"];
+      const name = names[rand(0, 3)];
+      const item = items[rand(0, 2)];
+      const unit = (rand(1, 5) + 0.5);
+      const qty = rand(2, 4);
+      return {
+        q: `${name} vett ${qty} db ${item}. Egy darab ${fmt(unit)} kg. Mennyi az összsúly?`,
+        a: fmt(unit * qty),
+        hint: "Szorzás: Egységnyi súly × darabszám"
+      };
+    }
+  },
+  {
+    gen: () => {
+      const price = (rand(1, 9) * 100 + 50.5);
+      return {
+        q: `Egy füzet ára ${fmt(price)} Ft. Mennyit fizetünk 2 darabért?`,
+        a: fmt(price * 2),
+        hint: "Szorzás: Ár × 2"
+      };
+    }
+  },
+  {
+    gen: () => {
+      const total = (rand(10, 40) / 10);
+      return {
+        q: `Egy ${fmt(total)} méteres kötelet kettévágtunk. Hány méter egy darab?`,
+        a: fmt(total / 2),
+        hint: "Osztás: Teljes hossz ÷ 2"
+      };
+    }
+  },
+  {
+    gen: () => {
+      const sum = rand(10, 50);
+      const parts = 10;
+      return {
+        q: `${sum} szem cukorkát 10 gyerek között osztunk szét. Mennyit kap egy gyerek?`,
+        a: fmt(sum / parts),
+        hint: "Tizedes eltolás: Oszd el a számot 10-zel."
+      };
+    }
+  }
+];
+
 const CATS = {
   szorzas: { id: 'szorzas', name:'Szorzótábla', color:'#4cc9f0', bBase: 1800, bInc: 200, 
     gen: (l) => { const a=rand(2, 5+l*2), b=rand(2, 9); return {q:`${a} × ${b}`, a:(a*b).toString(), k:`${a}x${b}`, p:[a, b]} } },
@@ -131,40 +196,18 @@ const CATS = {
     gen: (l) => { const d=[2,4,5,8,10,20,25][Math.min(6, l)]; const n=rand(1,d-1); return {q:`${n} / ${d}`, a:fmt(n/d), k:`${n}/${d}`, p:[n, d]} } }
 };
 
-let State = { cat: null, score: 0, time: 60, timerInterval: null, task: null, input: '', history: [], mistakes: [], level: 1, streak: 0, startTime: 0, isInputLocked: false, recentTasks: [] };
+let State = { cat: null, score: 0, time: 60, timerInterval: null, task: null, input: '', history: [], mistakes: [], level: 1, streak: 0, startTime: 0, isInputLocked: false, recentTasks: [], totalSolved: 0 };
 const rand = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
 const fmt = (n) => parseFloat(Number(n).toFixed(8)).toString();
 
 function getStats(id) { try { return JSON.parse(localStorage.getItem('stats_' + id)) || { hs: 0, avgT: 0, acc: 0, plays: 0 }; } catch (e) { return { hs: 0, avgT: 0, acc: 0, plays: 0 }; } }
 
-/**
- * Phase 1: Error Analyzer
- */
 function analyzeError(task, userInput, catId) {
   const val = parseFloat(userInput.replace(',', '.'));
   const correct = parseFloat(task.a.replace(',', '.'));
-  
-  // Tizedesvessző eltolódás hiba (pl. 0.4 * 2 = 8 vagy 0.08)
-  if (catId === 'tszorz' || catId === 'toszt') {
-    if (val === correct * 10 || val === correct / 10) return "Figyelj a tizedeshelyekre! Számold meg, összesen hány számjegy van a vessző után a feladatban.";
-    if (val === correct * 100 || val === correct / 100) return "Hűha, nagy az eltolódás! Ellenőrizd újra a helyiértékeket.";
-  }
-
-  // Műveleti inverz hiba (Osztás helyett szorzás)
-  if (catId === 'osztas') {
-    if (val === task.p[0] * task.p[1]) return "Ez a számok szorzata! Az osztásnál azt keressük, hányszor fér bele az egyik a másikba.";
-  }
-  
-  // Műveleti inverz hiba (Szorzás helyett osztás)
-  if (catId === 'szorzas') {
-    if (val === task.p[0] / task.p[1] || val === task.p[1] / task.p[0]) return "Összekeverted az osztást a szorzással?";
-  }
-
-  // Tizedes pontosság (pl. 0.25 helyett 0.2)
-  if (catId === 'tort' && Math.abs(val - correct) < 0.2) {
-    return "Majdnem! Próbáld pontosabban kiszámolni a tizedesjegyeket.";
-  }
-
+  if ((catId === 'tszorz' || catId === 'toszt') && (val === correct * 10 || val === correct / 10)) return "Figyelj a tizedeshelyekre! Számold meg a vessző utáni számjegyeket.";
+  if (catId === 'osztas' && val === task.p[0] * task.p[1]) return "Ez a szorzatuk! Osztásnál azt keressük, hányszor fér bele.";
+  if (task.hint) return task.hint; // Ha van beépített hint (szöveges feladat), azt adjuk vissza
   return null;
 }
 
@@ -188,7 +231,7 @@ function renderHome() {
 
 function startGame(id) {
   if (State.timerInterval) clearInterval(State.timerInterval);
-  State = { cat: id, score: 0, time: 60, timerInterval: null, task: null, input: '', history: [], mistakes: [], level: 1, streak: 0, startTime: 0, isInputLocked: false, recentTasks: [] };
+  State = { cat: id, score: 0, time: 60, timerInterval: null, task: null, input: '', history: [], mistakes: [], level: 1, streak: 0, startTime: 0, isInputLocked: false, recentTasks: [], totalSolved: 0 };
   const catCfg = CATS[id];
   document.documentElement.style.setProperty('--accent', catCfg.color);
   document.getElementById('cat-badge').textContent = catCfg.name;
@@ -210,40 +253,46 @@ function startGame(id) {
 function nextTask() {
   State.input = ''; 
   State.isInputLocked = false;
+  State.totalSolved++;
   document.getElementById('answer-text').textContent = '';
   document.getElementById('answer-box').classList.remove('has-input');
   
   let selectedTask = null;
-  const lastKey = State.task ? State.task.k : null; // Elmentjük az előző feladat azonosítóját
+  const lastKey = State.task ? State.task.k : null;
 
-  // 1. Megpróbálunk hibát ismételni, de CSAK ha nem az volt az előző
-  if (State.mistakes.length > 0 && Math.random() < 0.3) {
-    const validMistakes = State.mistakes.filter(m => m.k !== lastKey);
-    if (validMistakes.length > 0) {
-      selectedTask = validMistakes[rand(0, validMistakes.length - 1)];
+  // INTERLEAVING LOGIKA: Minden 7. feladat szöveges (kivéve a legelső szinteket ha zavaró)
+  if (State.totalSolved % 7 === 0) {
+    selectedTask = WORD_PROBLEM_TEMPLATES[rand(0, WORD_PROBLEM_TEMPLATES.length - 1)].gen();
+    selectedTask.isWord = true;
+  } else {
+    // 1. Hibaismétlés (Anti-Spam)
+    if (State.mistakes.length > 0 && Math.random() < 0.25) {
+      const validMistakes = State.mistakes.filter(m => m.k !== lastKey);
+      if (validMistakes.length > 0) selectedTask = validMistakes[rand(0, validMistakes.length - 1)];
     }
-  }
 
-  // 2. Ha nem volt alkalmas hiba, generálunk újat
-  if (!selectedTask) {
-    let attempts = 0;
-    while (attempts < 15) {
-      const t = CATS[State.cat].gen(State.level);
-      // Ne legyen ugyanaz, mint az előző, ÉS ne legyen benne a recentTasks-ban
-      if (t.k !== lastKey && !State.recentTasks.includes(t.k)) { 
-        selectedTask = t; 
-        break; 
+    // 2. Generálás
+    if (!selectedTask) {
+      let attempts = 0;
+      while (attempts < 15) {
+        const t = CATS[State.cat].gen(State.level);
+        if (t.k !== lastKey && !State.recentTasks.includes(t.k)) { selectedTask = t; break; }
+        attempts++;
       }
-      attempts++;
+      if (!selectedTask) selectedTask = CATS[State.cat].gen(State.level);
     }
-    if (!selectedTask) selectedTask = CATS[State.cat].gen(State.level);
   }
 
   State.task = selectedTask;
-  State.recentTasks.push(selectedTask.k);
-  if (State.recentTasks.length > 8) State.recentTasks.shift();
+  if (!selectedTask.isWord) {
+    State.recentTasks.push(selectedTask.k);
+    if (State.recentTasks.length > 8) State.recentTasks.shift();
+  }
   
-  document.getElementById('task-eq').textContent = `${State.task.q} = ?`;
+  const eqEl = document.getElementById('task-eq');
+  eqEl.textContent = selectedTask.isWord ? selectedTask.q : `${selectedTask.q} = ?`;
+  eqEl.className = selectedTask.isWord ? 'task-eq word-problem' : 'task-eq';
+  
   State.startTime = performance.now();
 }
 
@@ -258,28 +307,23 @@ function submit() {
 
   if (isCorrect) {
     State.streak++;
-    State.mistakes = State.mistakes.filter(m => m.k !== State.task.k);
+    if (!State.task.isWord) State.mistakes = State.mistakes.filter(m => m.k !== State.task.k);
     
     const cat = CATS[State.cat];
     const dynamicBonus = cat.bBase + (State.level * cat.bInc);
-    let points = 1;
+    let points = State.task.isWord ? 5 : 1; // A szöveges feladat több pontot ér!
     if (rt < dynamicBonus) points++;
-    if (State.level > 3) points++;
     State.score += points;
+    
     if (State.streak >= 5 && State.level < 5) { State.level++; State.streak = 0; showLevelUp(); }
     const el = document.getElementById('score-num'); el.textContent = State.score; el.classList.add('bump');
     setTimeout(() => el.classList.remove('bump'), 200);
   } else {
     State.streak = 0;
-    if (!State.mistakes.find(m => m.k === State.task.k)) State.mistakes.push(State.task);
-    if (State.level > 1) State.level--;
+    if (!State.task.isWord && !State.mistakes.find(m => m.k === State.task.k)) State.mistakes.push(State.task);
     
-    // Phase 1: Analízis futtatása hiba esetén
     const tip = analyzeError(State.task, State.input, State.cat);
-    if (tip) {
-      showTip(tip);
-      nextDelay = 2200; // Hosszabb szünet, hogy elolvashassa a tippet
-    }
+    if (tip) { showTip(tip); nextDelay = 2500; }
   }
   setTimeout(nextTask, nextDelay);
 }
@@ -303,7 +347,8 @@ function renderHistory() {
   const container = document.getElementById('history-list'); container.innerHTML = '';
   [...State.history].reverse().slice(0, 10).forEach(h => {
     const item = document.createElement('div'); item.className = `history-item ${h.ok ? 'correct' : ''}`;
-    item.innerHTML = `<div style="flex:1">${h.q} = <b>${h.ua}</b> ${!h.ok ? `<span style="color:var(--text-dim); font-size: 0.9em;"> (${h.ca})</span>` : ''}</div><div style="font-size:11px; opacity:0.6;">${Math.round(h.rt)}ms</div>`;
+    const shortQ = h.q.length > 25 ? h.q.substring(0, 22) + '...' : h.q;
+    item.innerHTML = `<div style="flex:1">${shortQ} = <b>${h.ua}</b> ${!h.ok ? `<span style="color:var(--text-dim); font-size: 0.9em;"> (${h.ca})</span>` : ''}</div><div style="font-size:11px; opacity:0.6;">${Math.round(h.rt)}ms</div>`;
     container.appendChild(item);
   });
 }
@@ -312,7 +357,7 @@ function handleKey(v) {
   if (State.isInputLocked) return;
   if (v === 'OK') submit();
   else if (v === 'DEL') State.input = State.input.slice(0, -1);
-  else { if ((v === '.' || v === ',') && (State.input.includes('.') || State.input.includes(','))) return; if (State.input.length < 8) State.input += v; }
+  else { if ((v === '.' || v === ',') && (State.input.includes('.') || State.input.includes(','))) return; if (State.input.length < 12) State.input += v; }
   document.getElementById('answer-text').textContent = State.input.replace('.', ',');
   document.getElementById('answer-box').classList.toggle('has-input', State.input.length > 0);
 }
